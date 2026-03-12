@@ -306,7 +306,6 @@ html, body { height: 100%; overflow: hidden; font-family: system-ui, -apple-syst
       <button class="subtype-btn" id="sub-MED"   onclick="selectSubtype('MED')">🏥 Medical</button>
       <button class="subtype-btn" id="sub-FIRE"  onclick="selectSubtype('FIRE')">🔥 Fire</button>
       <button class="subtype-btn" id="sub-GAS"   onclick="selectSubtype('GAS')">💨 Gas</button>
-      <button class="subtype-btn" id="sub-OTHER" onclick="selectSubtype('OTHER')">⚠️ Other</button>
     </div>
   </div>
 
@@ -505,6 +504,20 @@ let activeKey = null;       // currently open bottom sheet
 let activeStatus = null;
 let activeSubtype = null;
 
+// ─── NEW EMERGENCY PROMPT ─────────────────────────────────────────────────────
+(function checkNewEmergency() {
+  if (Object.keys(statuses).length === 0) return; // no saved data, skip prompt
+  const last = Object.values(statuses).map(s => s.updatedAt).filter(Boolean).sort().pop();
+  const age  = last ? Math.round((Date.now() - new Date(last)) / 3600000) : null;
+  const msg  = age !== null
+    ? `You have saved data from ~${age} hour${age !== 1 ? 's' : ''} ago.\n\nIs this a NEW emergency? (OK = clear data and start fresh\nCancel = keep your existing data)`
+    : 'You have saved data from a previous session.\n\nIs this a NEW emergency? (OK = clear data\nCancel = keep existing data)';
+  if (window.confirm(msg)) {
+    statuses = {};
+    saveState(statuses);
+  }
+})();
+
 // ─── MAP ─────────────────────────────────────────────────────────────────────
 // Calculate map center from house positions
 const lats = HOUSES.map(h => h.lat);
@@ -570,17 +583,28 @@ function houseColor(key) {
   return '#FFC107';
 }
 
+function houseSubtype(key) {
+  const s = statuses[key];
+  return (s?.status === 'RED') ? (s.subtype || null) : null;
+}
+
 function addMarker(h) {
   const color = houseColor(h.key);
   const m = L.marker([h.lat, h.lng], {
-    icon: makeIcon(h.houseNumber, color),
+    icon: makeIcon(h.houseNumber, color, houseSubtype(h.key)),
     zIndexOffset: statuses[h.key]?.status === 'RED' ? 100 : 0,
   }).addTo(map);
   m.on('click', () => openSheet(h.key));
   markers[h.key] = m;
 }
 
-function makeIcon(label, color) {
+const SUBTYPE_SYMBOL = { MED: '🏥', FIRE: '🔥', GAS: '💨' };
+
+function makeIcon(label, color, subtype) {
+  const sym = subtype ? SUBTYPE_SYMBOL[subtype] : null;
+  const inner = sym
+    ? `<div style="font-size:14px;line-height:1;">${sym}</div>`
+    : `<div style="font-size:10px;font-weight:700;line-height:1;">${label}</div>`;
   return L.divIcon({
     html: `<div style="
       background:${color};
@@ -588,12 +612,9 @@ function makeIcon(label, color) {
       border-radius:50%;
       width:30px; height:30px;
       display:flex; align-items:center; justify-content:center;
-      font-size:10px; font-weight:700;
       border:2px solid rgba(0,0,0,0.25);
       box-shadow:0 2px 5px rgba(0,0,0,0.3);
-      white-space:nowrap; overflow:hidden;
-      line-height:1;
-    ">${label}</div>`,
+    ">${inner}</div>`,
     iconSize: [30, 30],
     iconAnchor: [15, 15],
     className: '',
@@ -604,7 +625,7 @@ function refreshMarker(key) {
   const h = HOUSES.find(x => x.key === key);
   if (!h || !markers[key]) return;
   const color = houseColor(key);
-  markers[key].setIcon(makeIcon(h.houseNumber, color));
+  markers[key].setIcon(makeIcon(h.houseNumber, color, houseSubtype(key)));
   if (statuses[key]?.status === 'RED') {
     markers[key].setZIndexOffset(100);
   } else {
@@ -664,7 +685,7 @@ function selectSubtype(t) {
 }
 
 function applySubtypeUI(t) {
-  ['MED','FIRE','GAS','OTHER'].forEach(x => {
+  ['MED','FIRE','GAS'].forEach(x => {
     document.getElementById(`sub-${x}`).className = `subtype-btn${t===x?' selected':''}`;
   });
 }
