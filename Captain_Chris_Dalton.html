@@ -689,7 +689,6 @@ function applyBuildingFootprints(polygons) {
       matched++;
     }
   });
-  showToast(`Matched ${matched}/${HOUSES.length} houses to buildings`, matched ? 'ok' : 'error');
   if (matched) redrawBuildingSVG();
 }
 
@@ -725,12 +724,7 @@ async function loadBuildingFootprints() {
     } catch { return; }
   }
 
-  if (polygons && polygons.length) {
-    showToast(`Overpass: ${polygons.length} buildings found`, 'ok');
-    applyBuildingFootprints(polygons);
-  } else {
-    showToast('Overpass: 0 buildings — no OSM footprints here', 'error');
-  }
+  if (polygons && polygons.length) applyBuildingFootprints(polygons);
 }
 
 map.on('load', loadBuildingFootprints);
