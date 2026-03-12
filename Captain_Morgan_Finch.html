@@ -576,6 +576,107 @@ function initHouseLayers() {
 map.on('load', initHouseLayers);
 map.on('styledata', () => { if (map.isStyleLoaded()) initHouseLayers(); });
 
+// ─── BUILDING POLYGON UPGRADE ─────────────────────────────────────────────────
+// After tiles load, replace circle markers with actual OSM building shapes
+const houseBuildingGeom = {}; // key → building polygon geometry
+let buildingsInitialized = false;
+
+function buildingGeoJSON() {
+  return {
+    type: 'FeatureCollection',
+    features: Object.keys(houseBuildingGeom).map(key => {
+      const s = statuses[key];
+      const status = s?.status || 'UNKNOWN';
+      const subtype = status === 'RED' ? (s?.subtype || null) : null;
+      const h = HOUSES.find(x => x.key === key);
+      return {
+        type: 'Feature',
+        geometry: houseBuildingGeom[key],
+        properties: {
+          key,
+          label: subtype ? `${SUBTYPE_SYMBOL[subtype]}\n${h.houseNumber}` : h.houseNumber,
+          color: status === 'GREEN' ? '#4CAF50' : status === 'RED' ? '#f44336' : '#FFC107',
+        },
+      };
+    }),
+  };
+}
+
+function updateBuildingLayer() {
+  const src = map.getSource('buildings');
+  if (src) src.setData(buildingGeoJSON());
+  // Also sync circle marker colors for unmatched houses
+  HOUSES.forEach(h => {
+    const m = houseMarkers[h.key];
+    if (!m) return;
+    m.el.style.background = markerColor(h.key);
+    m.el.textContent = markerLabel(h.key);
+  });
+}
+
+function updateHouseLayer() {
+  updateBuildingLayer();
+}
+
+map.on('idle', () => {
+  if (buildingsInitialized) return;
+  buildingsInitialized = true;
+
+  let found = 0;
+  HOUSES.forEach(h => {
+    const pt = map.project([h.lng, h.lat]);
+    const feats = map.queryRenderedFeatures(
+      [[pt.x - 10, pt.y - 10], [pt.x + 10, pt.y + 10]],
+      { layers: ['building'] }
+    );
+    if (feats.length) {
+      houseBuildingGeom[h.key] = feats[0].geometry;
+      // Hide the circle marker — building polygon takes over
+      if (houseMarkers[h.key]) houseMarkers[h.key].el.style.display = 'none';
+      found++;
+    }
+  });
+
+  if (!found) return;
+
+  try {
+    map.addSource('buildings', { type: 'geojson', data: buildingGeoJSON() });
+
+    map.addLayer({
+      id: 'building-fill',
+      type: 'fill',
+      source: 'buildings',
+      paint: {
+        'fill-color': ['get', 'color'],
+        'fill-opacity': 0.82,
+        'fill-outline-color': 'rgba(0,0,0,0.4)',
+      },
+    });
+
+    map.addLayer({
+      id: 'building-labels',
+      type: 'symbol',
+      source: 'buildings',
+      layout: {
+        'text-field': ['get', 'label'],
+        'text-size': 11,
+        'text-allow-overlap': true,
+        'text-ignore-placement': true,
+      },
+      paint: { 'text-color': '#ffffff', 'text-halo-color': '#000000', 'text-halo-width': 1 },
+    });
+
+    map.on('click', 'building-fill', e => {
+      if (e.features.length) openSheet(e.features[0].properties.key);
+    });
+  } catch(e) {
+    // Building polygon upgrade failed — circles remain as fallback
+    HOUSES.forEach(h => {
+      if (houseMarkers[h.key]) houseMarkers[h.key].el.style.display = '';
+    });
+  }
+});
+
 updateCounts();
 
 // ─── BOTTOM SHEET ─────────────────────────────────────────────────────────────
