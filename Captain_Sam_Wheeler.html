@@ -698,7 +698,7 @@ function updateCounts() {
 let syncQueue = {}; // keys pending sync
 
 async function syncToSupabase(key) {
-  if (!SUPABASE_URL || SUPABASE_URL === 'https://fvbjmgpmjejkappwxgmk.supabase.co') {
+  if (!SUPABASE_URL || SUPABASE_URL.startsWith('{{')) {
     showToast('Sync skipped: no Supabase URL', 'error');
     return;
   }
@@ -763,7 +763,7 @@ function showToast(msg, type) {
 }
 
 async function syncAllPending() {
-  if (!SUPABASE_URL || SUPABASE_URL === 'https://fvbjmgpmjejkappwxgmk.supabase.co') return;
+  if (!SUPABASE_URL || SUPABASE_URL.startsWith('{{')) return;
   // Re-sync everything from localStorage
   for (const key of Object.keys(statuses)) {
     syncQueue[key] = true;
