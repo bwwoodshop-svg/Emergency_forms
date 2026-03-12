@@ -591,9 +591,10 @@ map.on('load', initHouseLayers);
 map.on('styledata', () => { if (map.isStyleLoaded()) initHouseLayers(); });
 
 // ─── BUILDING POLYGON UPGRADE ─────────────────────────────────────────────────
-// After tiles load, replace circle markers with actual OSM building shapes
-const houseBuildingGeom = {}; // key → building polygon geometry
-let buildingsInitialized = false;
+// Fetches OSM building footprints via Overpass API (once, then cached in localStorage).
+// Circles are replaced by colored building shapes; houses with no OSM footprint keep circles.
+const houseBuildingGeom = {}; // key → GeoJSON Polygon geometry
+const BLDG_CACHE_KEY = `flint_buildings_${CAPTAIN_NAME.replace(/\s+/g,'_')}`;
 
 function buildingGeoJSON() {
   return {
@@ -619,7 +620,6 @@ function buildingGeoJSON() {
 function updateBuildingLayer() {
   const src = map.getSource('buildings');
   if (src) src.setData(buildingGeoJSON());
-  // Also sync circle marker colors for unmatched houses
   HOUSES.forEach(h => {
     const m = houseMarkers[h.key];
     if (!m) return;
@@ -632,84 +632,104 @@ function updateHouseLayer() {
   updateBuildingLayer();
 }
 
-map.on('idle', () => {
-  if (buildingsInitialized) return;
-  buildingsInitialized = true;
-
-  // Query ALL buildings in the current viewport, then match each house to its nearest building.
-  // This works even when geocoded address points sit at the curb (outside the building polygon).
-  // Try querying without layer filter first to discover actual layer names if 'building' is wrong.
-  const allFeatures = map.queryRenderedFeatures();
-  const layerNames = [...new Set(allFeatures.map(f => f.layer.id))];
-  const allBuildings = allFeatures.filter(f => f.layer.id === 'building' || f.layer.id === 'building-3d' || f.sourceLayer === 'building');
-  showToast(`Found ${allBuildings.length} buildings. Layers: ${layerNames.slice(0,6).join(', ')}`, allBuildings.length ? 'ok' : 'error');
-
-  // Pre-compute each building's approximate centroid
-  const buildingCentroids = allBuildings.map(feat => {
-    const coords = feat.geometry.type === 'Polygon'
-      ? feat.geometry.coordinates[0]
-      : feat.geometry.coordinates[0][0]; // MultiPolygon
-    const lng = coords.reduce((s, c) => s + c[0], 0) / coords.length;
-    const lat = coords.reduce((s, c) => s + c[1], 0) / coords.length;
-    return { feat, lng, lat };
-  });
-
-  let found = 0;
+function applyBuildingFootprints(polygons) {
+  // polygons: array of GeoJSON Polygon geometries with centroid {lng, lat, geom}
+  const matched = new Set();
   HOUSES.forEach(h => {
-    if (!buildingCentroids.length) return;
-    // Find nearest building centroid to this house's geocoded position
     let best = null, bestDist = Infinity;
-    buildingCentroids.forEach(b => {
+    polygons.forEach(b => {
       const d = Math.hypot(b.lng - h.lng, b.lat - h.lat);
       if (d < bestDist) { bestDist = d; best = b; }
     });
-    // Accept match within ~40 metres (~0.0004 degrees)
-    if (best && bestDist < 0.0004) {
-      houseBuildingGeom[h.key] = best.feat.geometry;
+    // Accept nearest building within ~50 metres (~0.00045 deg lat / ~0.0006 deg lng at 41°N)
+    if (best && bestDist < 0.0006) {
+      houseBuildingGeom[h.key] = best.geom;
       if (houseMarkers[h.key]) houseMarkers[h.key].el.style.display = 'none';
-      found++;
+      matched.add(h.key);
     }
   });
 
-  if (!found) return;
+  if (!matched.size) return;
 
   try {
-    map.addSource('buildings', { type: 'geojson', data: buildingGeoJSON() });
-
-    map.addLayer({
-      id: 'building-fill',
-      type: 'fill',
-      source: 'buildings',
-      paint: {
-        'fill-color': ['get', 'color'],
-        'fill-opacity': 0.82,
-        'fill-outline-color': 'rgba(0,0,0,0.4)',
-      },
-    });
-
-    map.addLayer({
-      id: 'building-labels',
-      type: 'symbol',
-      source: 'buildings',
-      layout: {
-        'text-field': ['get', 'label'],
-        'text-size': 11,
-        'text-allow-overlap': true,
-        'text-ignore-placement': true,
-      },
-      paint: { 'text-color': '#ffffff', 'text-halo-color': '#000000', 'text-halo-width': 1 },
-    });
-
-    map.on('click', 'building-fill', e => {
-      if (e.features.length) openSheet(e.features[0].properties.key);
-    });
+    if (!map.getSource('buildings')) {
+      map.addSource('buildings', { type: 'geojson', data: buildingGeoJSON() });
+      map.addLayer({
+        id: 'building-fill',
+        type: 'fill',
+        source: 'buildings',
+        paint: {
+          'fill-color': ['get', 'color'],
+          'fill-opacity': 0.82,
+          'fill-outline-color': 'rgba(0,0,0,0.4)',
+        },
+      });
+      map.addLayer({
+        id: 'building-labels',
+        type: 'symbol',
+        source: 'buildings',
+        layout: {
+          'text-field': ['get', 'label'],
+          'text-size': 11,
+          'text-allow-overlap': true,
+          'text-ignore-placement': true,
+        },
+        paint: { 'text-color': '#ffffff', 'text-halo-color': '#000000', 'text-halo-width': 1 },
+      });
+      map.on('click', 'building-fill', e => {
+        if (e.features.length) openSheet(e.features[0].properties.key);
+      });
+    } else {
+      map.getSource('buildings').setData(buildingGeoJSON());
+    }
   } catch(e) {
-    // Building polygon upgrade failed — circles remain as fallback
-    HOUSES.forEach(h => {
-      if (houseMarkers[h.key]) houseMarkers[h.key].el.style.display = '';
-    });
+    // Layer add failed — restore circles
+    HOUSES.forEach(h => { if (houseMarkers[h.key]) houseMarkers[h.key].el.style.display = ''; });
   }
-});
+}
+
+async function loadBuildingFootprints() {
+  if (!navigator.onLine) return;
+
+  // Use cached footprints if available
+  let polygons = null;
+  const cached = localStorage.getItem(BLDG_CACHE_KEY);
+  if (cached) {
+    try { polygons = JSON.parse(cached); } catch {}
+  }
+
+  if (!polygons) {
+    // Query Overpass API for all buildings in the captain's area (+buffer)
+    const pad = 0.004;
+    const bbox = `${minLat - pad},${minLng - pad},${maxLat + pad},${maxLng + pad}`;
+    const query = `[out:json][timeout:25];way["building"](${bbox});out geom;`;
+    try {
+      const resp = await fetch('https://overpass-api.de/api/interpreter', {
+        method: 'POST',
+        body: query,
+      });
+      if (!resp.ok) return;
+      const data = await resp.json();
+      polygons = data.elements
+        .filter(el => el.type === 'way' && el.geometry && el.geometry.length >= 3)
+        .map(el => {
+          const coords = el.geometry.map(pt => [pt.lon, pt.lat]);
+          // Close the ring if needed
+          if (coords[0][0] !== coords[coords.length-1][0] || coords[0][1] !== coords[coords.length-1][1]) {
+            coords.push(coords[0]);
+          }
+          const lng = coords.reduce((s, c) => s + c[0], 0) / coords.length;
+          const lat = coords.reduce((s, c) => s + c[1], 0) / coords.length;
+          return { lng, lat, geom: { type: 'Polygon', coordinates: [coords] } };
+        });
+      localStorage.setItem(BLDG_CACHE_KEY, JSON.stringify(polygons));
+    } catch { return; }
+  }
+
+  if (polygons && polygons.length) applyBuildingFootprints(polygons);
+}
+
+map.on('load', loadBuildingFootprints);
 
 updateCounts();
 
