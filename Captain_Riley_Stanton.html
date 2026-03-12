@@ -532,7 +532,6 @@ function buildHouseGeoJSON() {
       const label = subtype ? `${SUBTYPE_SYMBOL[subtype]} ${h.houseNumber}` : h.houseNumber;
       return {
         type: 'Feature',
-        id: h.key,
         geometry: hasBuilding
           ? houseBuildingGeom[h.key]
           : { type: 'Point', coordinates: [h.lng, h.lat] },
@@ -547,10 +546,10 @@ function updateHouseLayer() {
   if (src) src.setData(buildHouseGeoJSON());
 }
 
-map.on('style.load', () => {
+map.on('load', () => {
   map.fitBounds([[minLng, minLat], [maxLng, maxLat]], { padding: 70, maxZoom: 18, animate: false });
 
-  map.addSource('houses', { type: 'geojson', data: buildHouseGeoJSON(), promoteId: 'key' });
+  map.addSource('houses', { type: 'geojson', data: buildHouseGeoJSON() });
 
   // Colored fill for houses matched to an OSM building polygon
   map.addLayer({
