@@ -636,16 +636,32 @@ map.on('idle', () => {
   if (buildingsInitialized) return;
   buildingsInitialized = true;
 
+  // Query ALL buildings in the current viewport, then match each house to its nearest building.
+  // This works even when geocoded address points sit at the curb (outside the building polygon).
+  const allBuildings = map.queryRenderedFeatures({ layers: ['building', 'building-3d'] });
+
+  // Pre-compute each building's approximate centroid
+  const buildingCentroids = allBuildings.map(feat => {
+    const coords = feat.geometry.type === 'Polygon'
+      ? feat.geometry.coordinates[0]
+      : feat.geometry.coordinates[0][0]; // MultiPolygon
+    const lng = coords.reduce((s, c) => s + c[0], 0) / coords.length;
+    const lat = coords.reduce((s, c) => s + c[1], 0) / coords.length;
+    return { feat, lng, lat };
+  });
+
   let found = 0;
   HOUSES.forEach(h => {
-    const pt = map.project([h.lng, h.lat]);
-    const feats = map.queryRenderedFeatures(
-      [[pt.x - 10, pt.y - 10], [pt.x + 10, pt.y + 10]],
-      { layers: ['building'] }
-    );
-    if (feats.length) {
-      houseBuildingGeom[h.key] = feats[0].geometry;
-      // Hide the circle marker — building polygon takes over
+    if (!buildingCentroids.length) return;
+    // Find nearest building centroid to this house's geocoded position
+    let best = null, bestDist = Infinity;
+    buildingCentroids.forEach(b => {
+      const d = Math.hypot(b.lng - h.lng, b.lat - h.lat);
+      if (d < bestDist) { bestDist = d; best = b; }
+    });
+    // Accept match within ~40 metres (~0.0004 degrees)
+    if (best && bestDist < 0.0004) {
+      houseBuildingGeom[h.key] = best.feat.geometry;
       if (houseMarkers[h.key]) houseMarkers[h.key].el.style.display = 'none';
       found++;
     }
