@@ -531,7 +531,7 @@ const map = new maplibregl.Map({
 });
 
 // ─── HOUSE GEOJSON LAYER ──────────────────────────────────────────────────────
-const houseBuildingGeom = {}; // key → OSM building polygon geometry
+const houseBuildingGeom = {}; // key → OSM building polygon geometry (filled in after idle)
 let buildingsInitialized = false;
 
 function buildHouseGeoJSON() {
@@ -542,14 +542,12 @@ function buildHouseGeoJSON() {
       const status = s?.status || 'UNKNOWN';
       const subtype = status === 'RED' ? (s?.subtype || null) : null;
       const statusColor = status === 'GREEN' ? 'green' : status === 'RED' ? 'red' : 'unknown';
-      const hasBuilding = houseBuildingGeom[h.key] ? 1 : 0; // integer — avoids boolean filter issues
       const label = subtype ? `${SUBTYPE_SYMBOL[subtype]} ${h.houseNumber}` : h.houseNumber;
+      const geom = houseBuildingGeom[h.key] || { type: 'Point', coordinates: [h.lng, h.lat] };
       return {
         type: 'Feature',
-        geometry: hasBuilding
-          ? houseBuildingGeom[h.key]
-          : { type: 'Point', coordinates: [h.lng, h.lat] },
-        properties: { key: h.key, houseNumber: h.houseNumber, label, statusColor, hasBuilding },
+        geometry: geom,
+        properties: { key: h.key, label, statusColor, isPoint: houseBuildingGeom[h.key] ? 0 : 1 },
       };
     }),
   };
@@ -560,70 +558,65 @@ function updateHouseLayer() {
   if (src) src.setData(buildHouseGeoJSON());
 }
 
+map.on('error', e => showToast('Map error: ' + (e.error?.message || e.message || 'unknown'), 'error'));
+
 function initHouseLayers() {
-  if (map.getSource('houses')) return; // guard against double-init
-  map.fitBounds([[minLng, minLat], [maxLng, maxLat]], { padding: 70, maxZoom: 18, animate: false });
+  if (map.getSource('houses')) return;
+  try {
+    map.fitBounds([[minLng, minLat], [maxLng, maxLat]], { padding: 70, maxZoom: 18, animate: false });
+    map.addSource('houses', { type: 'geojson', data: buildHouseGeoJSON() });
 
-  map.addSource('houses', { type: 'geojson', data: buildHouseGeoJSON() });
+    map.addLayer({
+      id: 'house-fill',
+      type: 'fill',
+      source: 'houses',
+      filter: ['==', ['get', 'isPoint'], 0],
+      paint: {
+        'fill-color': ['match', ['get', 'statusColor'], 'green', '#4CAF50', 'red', '#f44336', '#FFC107'],
+        'fill-opacity': 0.78,
+        'fill-outline-color': 'rgba(0,0,0,0.4)',
+      },
+    });
 
-  // Colored fill for houses matched to an OSM building polygon
-  map.addLayer({
-    id: 'house-fill',
-    type: 'fill',
-    source: 'houses',
-    filter: ['==', ['get', 'hasBuilding'], 1],
-    paint: {
-      'fill-color': ['match', ['get', 'statusColor'], 'green', '#4CAF50', 'red', '#f44336', '#FFC107'],
-      'fill-opacity': 0.78,
-      'fill-outline-color': 'rgba(0,0,0,0.4)',
-    },
-  });
+    map.addLayer({
+      id: 'house-circle',
+      type: 'circle',
+      source: 'houses',
+      filter: ['==', ['get', 'isPoint'], 1],
+      paint: {
+        'circle-radius': 14,
+        'circle-color': ['match', ['get', 'statusColor'], 'green', '#4CAF50', 'red', '#f44336', '#FFC107'],
+        'circle-stroke-width': 2,
+        'circle-stroke-color': '#333333',
+      },
+    });
 
-  // Circle for houses not yet matched to a building polygon
-  map.addLayer({
-    id: 'house-circle',
-    type: 'circle',
-    source: 'houses',
-    filter: ['==', ['get', 'hasBuilding'], 0],
-    paint: {
-      'circle-radius': 14,
-      'circle-color': ['match', ['get', 'statusColor'], 'green', '#4CAF50', 'red', '#f44336', '#FFC107'],
-      'circle-stroke-width': 2,
-      'circle-stroke-color': 'rgba(0,0,0,0.3)',
-    },
-  });
+    map.addLayer({
+      id: 'house-labels',
+      type: 'symbol',
+      source: 'houses',
+      layout: {
+        'text-field': ['get', 'label'],
+        'text-size': 11,
+        'text-allow-overlap': true,
+        'text-ignore-placement': true,
+      },
+      paint: { 'text-color': '#ffffff', 'text-halo-color': '#000000', 'text-halo-width': 1 },
+    });
 
-  // House number label — always visible on every house
-  map.addLayer({
-    id: 'house-labels',
-    type: 'symbol',
-    source: 'houses',
-    layout: {
-      'text-field': ['get', 'label'],
-      'text-size': 11,
-      'text-font': ['Noto Sans Bold', 'Open Sans Bold', 'Arial Unicode MS Bold'],
-      'text-allow-overlap': true,
-      'text-ignore-placement': true,
-    },
-    paint: {
-      'text-color': '#ffffff',
-      'text-halo-color': 'rgba(0,0,0,0.55)',
-      'text-halo-width': 1.5,
-    },
-  });
+    map.on('click', 'house-fill',   e => { if (e.features.length) openSheet(e.features[0].properties.key); });
+    map.on('click', 'house-circle', e => { if (e.features.length) openSheet(e.features[0].properties.key); });
 
-  map.on('click', 'house-fill',   e => { if (e.features.length) openSheet(e.features[0].properties.key); });
-  map.on('click', 'house-circle', e => { if (e.features.length) openSheet(e.features[0].properties.key); });
+    showToast('Map ready — tap a house', 'ok');
+  } catch(e) {
+    showToast('Layer error: ' + e.message, 'error');
+  }
 }
 
-// Use loaded() check so we don't miss the event if style already loaded
-if (map.loaded()) {
-  initHouseLayers();
-} else {
-  map.on('load', initHouseLayers);
-}
+map.on('load', initHouseLayers);
+map.on('styledata', () => { if (map.isStyleLoaded()) initHouseLayers(); });
 
-// Once tiles are fully loaded, detect OSM building polygon under each house
+// After map idles, upgrade circle markers to real OSM building polygons
 map.on('idle', () => {
   if (buildingsInitialized) return;
   buildingsInitialized = true;
@@ -637,7 +630,6 @@ map.on('idle', () => {
     if (feats.length) { houseBuildingGeom[h.key] = feats[0].geometry; found++; }
   });
   if (found) updateHouseLayer();
-  console.log(`OSM building footprints matched: ${found}/${HOUSES.length}`);
 });
 
 updateCounts();
