@@ -645,7 +645,11 @@ map.on('idle', () => {
 
   // Query ALL buildings in the current viewport, then match each house to its nearest building.
   // This works even when geocoded address points sit at the curb (outside the building polygon).
-  const allBuildings = map.queryRenderedFeatures({ layers: ['building', 'building-3d'] });
+  // Try querying without layer filter first to discover actual layer names if 'building' is wrong.
+  const allFeatures = map.queryRenderedFeatures();
+  const layerNames = [...new Set(allFeatures.map(f => f.layer.id))];
+  const allBuildings = allFeatures.filter(f => f.layer.id === 'building' || f.layer.id === 'building-3d' || f.sourceLayer === 'building');
+  showToast(`Found ${allBuildings.length} buildings. Layers: ${layerNames.slice(0,6).join(', ')}`, allBuildings.length ? 'ok' : 'error');
 
   // Pre-compute each building's approximate centroid
   const buildingCentroids = allBuildings.map(feat => {
