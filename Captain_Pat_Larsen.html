@@ -640,7 +640,7 @@ function buildHouseGeoJSON() {
       const status = s?.status || 'UNKNOWN';
       const subtype = status === 'RED' ? (s?.subtype || null) : null;
       const statusColor = status === 'GREEN' ? 'green' : status === 'RED' ? 'red' : 'unknown';
-      const hasBuilding = !!houseBuildingGeom[h.key];
+      const hasBuilding = houseBuildingGeom[h.key] ? 1 : 0; // integer — avoids boolean filter issues
       const label = subtype ? `${SUBTYPE_SYMBOL[subtype]} ${h.houseNumber}` : h.houseNumber;
       return {
         type: 'Feature',
@@ -658,7 +658,8 @@ function updateHouseLayer() {
   if (src) src.setData(buildHouseGeoJSON());
 }
 
-map.on('load', () => {
+function initHouseLayers() {
+  if (map.getSource('houses')) return; // guard against double-init
   map.fitBounds([[minLng, minLat], [maxLng, maxLat]], { padding: 70, maxZoom: 18, animate: false });
 
   map.addSource('houses', { type: 'geojson', data: buildHouseGeoJSON() });
@@ -668,7 +669,7 @@ map.on('load', () => {
     id: 'house-fill',
     type: 'fill',
     source: 'houses',
-    filter: ['==', ['get', 'hasBuilding'], true],
+    filter: ['==', ['get', 'hasBuilding'], 1],
     paint: {
       'fill-color': ['match', ['get', 'statusColor'], 'green', '#4CAF50', 'red', '#f44336', '#FFC107'],
       'fill-opacity': 0.78,
@@ -676,12 +677,12 @@ map.on('load', () => {
     },
   });
 
-  // Circle fallback for houses not matched to a building polygon
+  // Circle for houses not yet matched to a building polygon
   map.addLayer({
     id: 'house-circle',
     type: 'circle',
     source: 'houses',
-    filter: ['==', ['get', 'hasBuilding'], false],
+    filter: ['==', ['get', 'hasBuilding'], 0],
     paint: {
       'circle-radius': 14,
       'circle-color': ['match', ['get', 'statusColor'], 'green', '#4CAF50', 'red', '#f44336', '#FFC107'],
@@ -711,7 +712,14 @@ map.on('load', () => {
 
   map.on('click', 'house-fill',   e => { if (e.features.length) openSheet(e.features[0].properties.key); });
   map.on('click', 'house-circle', e => { if (e.features.length) openSheet(e.features[0].properties.key); });
-});
+}
+
+// Use loaded() check so we don't miss the event if style already loaded
+if (map.loaded()) {
+  initHouseLayers();
+} else {
+  map.on('load', initHouseLayers);
+}
 
 // Once tiles are fully loaded, detect OSM building polygon under each house
 map.on('idle', () => {
