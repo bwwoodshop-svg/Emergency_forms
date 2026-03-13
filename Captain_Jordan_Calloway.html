@@ -533,6 +533,13 @@ let activeSubtype = null;
   }
 })();
 
+// ─── DEBUG PANEL (remove before going live) ───────────────────────────────────
+const dbg = document.createElement('div');
+dbg.style.cssText = 'position:fixed;bottom:80px;left:10px;z-index:9999;background:rgba(0,0,0,0.85);color:#0f0;font-size:11px;font-family:monospace;padding:8px 12px;border-radius:8px;max-width:90vw;line-height:1.6;pointer-events:none;';
+dbg.innerHTML = 'Script: OK<br>';
+document.body.appendChild(dbg);
+function dbgLog(msg) { dbg.innerHTML += msg + '<br>'; }
+
 // ─── MAP ─────────────────────────────────────────────────────────────────────
 const lats = HOUSES.map(h => h.lat);
 const lngs = HOUSES.map(h => h.lng);
@@ -550,6 +557,8 @@ const map = new maplibregl.Map({
   minZoom: 14,
   maxBounds: [[minLng - 0.05, minLat - 0.03], [maxLng + 0.05, maxLat + 0.03]],
 });
+dbgLog(`Map created, center: ${(minLng+maxLng)/2 | 0},${(minLat+maxLat)/2 | 0}, houses: ${HOUSES.length}`);
+map.on('error', e => dbgLog('Map error: ' + e.error?.message));
 
 // ─── HOUSE MARKERS ────────────────────────────────────────────────────────────
 const houseMarkers = {}; // key → { marker, el }
@@ -593,7 +602,8 @@ function updateHouseLayer() {
 }
 
 function initHouseLayers() {
-  if (Object.keys(houseMarkers).length) return; // guard against double-init
+  dbgLog('initHouseLayers called, existing markers: ' + Object.keys(houseMarkers).length);
+  if (Object.keys(houseMarkers).length) return;
   try {
     map.fitBounds([[minLng, minLat], [maxLng, maxLat]], { padding: 70, maxZoom: 18, animate: false });
     HOUSES.forEach(h => {
@@ -603,12 +613,14 @@ function initHouseLayers() {
         .addTo(map);
       houseMarkers[h.key] = { marker, el };
     });
+    dbgLog('Markers placed: ' + Object.keys(houseMarkers).length);
   } catch(e) {
+    dbgLog('Marker ERROR: ' + e.message);
     showToast('Marker error: ' + e.message, 'error');
   }
 }
 
-map.on('load', initHouseLayers);
+map.on('load', () => { dbgLog('map load event fired'); initHouseLayers(); });
 
 // ─── BUILDING POLYGON UPGRADE (SVG overlay) ───────────────────────────────────
 // MapLibre v5 GeoJSON layers don't render reliably, so we draw building polygons
@@ -709,14 +721,16 @@ function applyBuildingFootprints(polygons) {
       matched++;
     }
   });
+  dbgLog('Buildings matched: ' + matched + '/' + HOUSES.length);
   if (matched) redrawBuildingSVG();
 }
 
 async function loadBuildingFootprints() {
-  if (!navigator.onLine) return;
+  if (!navigator.onLine) { dbgLog('Offline, skip buildings'); return; }
 
   let polygons = null;
   const cached = localStorage.getItem(BLDG_CACHE_KEY);
+  dbgLog('Building cache: ' + (cached ? JSON.parse(cached).length + ' entries' : 'none'));
   if (cached) {
     try { polygons = JSON.parse(cached); } catch {}
   }
