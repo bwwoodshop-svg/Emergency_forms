@@ -925,7 +925,7 @@ function buildReportText() {
       (s?.notes ? ` — "${s.notes}"` : '');
     if (st === 'GREEN') green.push(line);
     else if (st === 'RED') red.push(line);
-    else unknown.push(`  ${h.houseNumber} ${h.street}`);
+    else unknown.push(`  ${h.houseNumber} ${h.street}` + (s?.notes ? ` — "${s.notes}"` : ''));
   });
 
   let report = `BLOCK CAPTAIN REPORT\n`;
@@ -938,7 +938,7 @@ function buildReportText() {
   report += green.length ? green.join('\n') + '\n' : '  (none)\n';
   report += `\nNEEDS HELP (${red.length}):\n`;
   report += red.length ? red.join('\n') + '\n' : '  (none)\n';
-  report += `\nUNKNOWN / NOT CHECKED (${unknown.length}):\n`;
+  report += `\nUNKNOWN (${unknown.length}):\n`;
   report += unknown.length ? unknown.join('\n') + '\n' : '  (none)\n';
   report += `${'─'.repeat(40)}\n`;
   report += `TOTALS: ${green.length} Okay | ${red.length} Needs Help | ${unknown.length} Unknown\n`;
@@ -954,15 +954,27 @@ function hideReport() {
   document.getElementById('report-overlay').classList.remove('visible');
 }
 
-function sendSMS() {
+async function sendSMS() {
   const body = buildReportText();
-  const recipients = [DIRECTOR_PHONE, BACKUP_PHONE, COORDINATOR_PHONE, CAPTAIN_PHONE]
-    .filter(Boolean).join(',');
+  const phones = [DIRECTOR_PHONE, BACKUP_PHONE, COORDINATOR_PHONE, CAPTAIN_PHONE]
+    .filter(p => p && p.replace(/\D/g,'').length >= 7);
+  const recipientStr = phones.join(', ');
+
+  // Copy phone numbers to clipboard so user can paste into the SMS To: field.
+  // On iOS, navigator.share opens the share sheet but can't pre-fill recipients —
+  // clipboard is the reliable workaround.
+  try {
+    await navigator.clipboard.writeText(recipientStr);
+    showToast('Phone numbers copied — paste into To: field', 'ok');
+    await new Promise(r => setTimeout(r, 900)); // let toast show before app switches
+  } catch {
+    // clipboard unavailable — proceed anyway
+  }
 
   if (navigator.share) {
     navigator.share({ text: body }).catch(() => {});
   } else {
-    window.location.href = `sms:${recipients}?body=${encodeURIComponent(body)}`;
+    window.location.href = `sms:${phones.join(',')}?body=${encodeURIComponent(body)}`;
   }
 }
 
