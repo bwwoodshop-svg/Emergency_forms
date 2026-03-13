@@ -352,17 +352,21 @@ html, body { height: 100%; overflow: hidden; font-family: system-ui, -apple-syst
 
 <script>
 // ─── CAPTAIN DATA (injected by generator) ─────────────────────────────────────
+// Phone numbers are base64-encoded by generate_map_forms.py (enc() function).
+// atob() decodes them at runtime so plain numbers never appear in HTML source.
+// Names and addresses are not encoded — they are less sensitive and needed for
+// visible UI labels (header, report overlay, SMS message body).
 const CAPTAIN_NAME  = "Taylor Benson";
-const CAPTAIN_PHONE = "(801) 555-0106";
+const CAPTAIN_PHONE = atob("KDgwMSkgNTU1LTAxMDY=");
 const ASSIGNMENT    = "Pleasant View / Wilkie N";
 const DIRECTOR_NAME    = "Blake";
-const DIRECTOR_PHONE   = "(801) 593-9440";
+const DIRECTOR_PHONE   = atob("KDgwMSkgNTkzLTk0NDA=");
 const DIRECTOR_ADDRESS = "1400 Flint Meadows Dr Kaysville";
 const BACKUP_NAME    = "TBD";
-const BACKUP_PHONE   = "(801) 555-0099";
+const BACKUP_PHONE   = atob("KDgwMSkgNTU1LTAwOTk=");
 const BACKUP_ADDRESS = "TBD";
 const COORDINATOR_NAME  = "Blake";
-const COORDINATOR_PHONE = "(801) 593-9440";
+const COORDINATOR_PHONE = atob("KDgwMSkgNTkzLTk0NDA=");
 
 const SUPABASE_URL = "https://fvbjmgpmjejkappwxgmk.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ2YmptZ3BtamVqa2FwcHd4Z21rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNjQxNTIsImV4cCI6MjA4ODg0MDE1Mn0.TJeR1xAQFrKmpR8wnxmBnPn-ulxlRXyGfY25resm-v0";
@@ -499,6 +503,10 @@ let activeStatus = null;
 let activeSubtype = null;
 
 // ─── NEW EMERGENCY PROMPT ─────────────────────────────────────────────────────
+// Runs on page load. If captain has saved data from a prior session, asks whether
+// this is a new emergency. Uses s?.updatedAt (not s.updatedAt) because localStorage
+// can return null values that would throw if accessed directly. Wrapped in try/catch
+// to handle any corrupt stored data.
 (function checkNewEmergency() {
   if (Object.keys(statuses).length === 0) return; // no saved data, skip prompt
   try {
@@ -593,6 +601,10 @@ function initHouseLayers() {
   }
 }
 
+// IMPORTANT: Use map.on('load', ...) only — never map.on('styledata', ...).
+// styledata fires repeatedly during style loading; calling map.fitBounds() inside it
+// triggers a MapLibre "Attempting to run(), but is already running" error and silently
+// aborts all rendering. 'load' fires exactly once when the map is fully ready.
 map.on('load', initHouseLayers);
 
 // ─── BUILDING POLYGON UPGRADE (SVG overlay) ───────────────────────────────────
@@ -600,6 +612,10 @@ map.on('load', initHouseLayers);
 // as an SVG element layered directly on the map container. SVG is pure DOM — always works.
 // Overpass API fetches OSM footprints once; result is cached in localStorage.
 const houseBuildingGeom = {}; // key → { coords: [[lng,lat],...], centLng, centLat }
+
+// Cache key is versioned (v2). If the stored object format ever changes (e.g., adding
+// new required fields), bump to v3, v4, etc. to force a fresh Overpass fetch on all
+// captain phones. Old cache had objects without a 'coords' property, causing a crash.
 const BLDG_CACHE_KEY = `flint_buildings_v2_${CAPTAIN_NAME.replace(/\s+/g,'_')}`;
 
 // Create SVG canvas that covers the map exactly
@@ -617,7 +633,7 @@ function redrawBuildingSVG() {
   const NS = 'http://www.w3.org/2000/svg';
   Object.keys(houseBuildingGeom).forEach(key => {
     const b = houseBuildingGeom[key];
-    if (!b || !b.coords) return; // skip malformed cache entries
+    if (!b || !b.coords) return; // guard: skip malformed cache entries (e.g. loaded from old v1 cache before coords was added)
     const color = buildingColor(key);
     const s = statuses[key];
     const status = s?.status || 'UNKNOWN';
