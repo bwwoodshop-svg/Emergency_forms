@@ -597,10 +597,13 @@ function buildingColor(key) {
   return s === 'GREEN' ? '#4CAF50' : s === 'RED' ? '#f44336' : '#FFC107';
 }
 
+let svgRedrawCount = 0;
 function redrawBuildingSVG() {
+  svgRedrawCount++;
   bldgSvg.innerHTML = '';
   const NS = 'http://www.w3.org/2000/svg';
-  Object.keys(houseBuildingGeom).forEach(key => {
+  let firstCoord = '';
+  Object.keys(houseBuildingGeom).forEach((key, i) => {
     const b = houseBuildingGeom[key];
     const color = buildingColor(key);
     const s = statuses[key];
@@ -609,7 +612,8 @@ function redrawBuildingSVG() {
     const h = HOUSES.find(x => x.key === key);
 
     // Convert geo coords to screen pixels
-    const pts = b.coords.map(c => { const p = map.project(c); return `${p.x},${p.y}`; }).join(' ');
+    const pts = b.coords.map(c => { const p = map.project(c); return `${p.x|0},${p.y|0}`; }).join(' ');
+    if (i === 0) firstCoord = pts.split(' ')[0];
     const poly = document.createElementNS(NS, 'polygon');
     poly.setAttribute('points', pts);
     poly.setAttribute('fill', color);
@@ -648,6 +652,7 @@ function redrawBuildingSVG() {
       bldgSvg.appendChild(num);
     }
   });
+  dbgLog(`SVG#${svgRedrawCount}: ${bldgSvg.children.length} els, first pt: ${firstCoord}`);
 }
 
 // Redraw SVG whenever map moves or zooms
