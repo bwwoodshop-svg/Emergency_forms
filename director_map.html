@@ -125,6 +125,7 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 .house-dot.green { background: #4CAF50; }
 .house-dot.red   { background: #f44336; }
 .house-dot.gray  { background: #FFC107; }
+.house-dot.unchecked { background: #9E9E9E; }
 .house-info { flex: 1; }
 .house-addr   { font-weight: 600; color: #eee; }
 .house-detail { font-size: 0.7rem; color: #999; margin-top: 1px; }
@@ -190,6 +191,7 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
       <div class="pill pill-green"><span id="cnt-green">0</span> Okay</div>
       <div class="pill pill-red"  ><span id="cnt-red">0</span> Needs Help</div>
       <div class="pill pill-gray" ><span id="cnt-unk">0</span> Unknown</div>
+      <div class="pill" style="background:rgba(158,158,158,0.3);color:#bdbdbd"><span id="cnt-unchecked">0</span> Unchecked</div>
       <div class="pill pill-total"><span id="cnt-total">0</span> Total</div>
     </div>
     <button onclick="resetConfig()" style="width:auto;padding:6px 10px;font-size:0.72rem;background:#333;border-radius:6px;">⚙ Settings</button>
@@ -216,6 +218,7 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
         <button class="filter-btn" onclick="setFilter('GREEN',this,'')">Okay</button>
         <button class="filter-btn" onclick="setFilter('RED',this,'red')">Help</button>
         <button class="filter-btn" onclick="setFilter('UNKNOWN',this,'gray')">Unknown</button>
+        <button class="filter-btn" onclick="setFilter('UNCHECKED',this,'')">Unchecked</button>
       </div>
       <div id="house-list"></div>
       <div id="detail-panel">
@@ -324,9 +327,10 @@ function initMap() {
 // ─── MARKER COLOR / LABEL ─────────────────────────────────────────────────────
 function markerColor(key) {
   const s = statuses[key]?.status;
+  if (!s) return '#9E9E9E'; // unchecked — gray
   if (s === 'GREEN') return '#4CAF50';
   if (s === 'RED')   return '#f44336';
-  return '#FFC107';
+  return '#FFC107'; // explicitly marked UNKNOWN
 }
 
 function markerLabel(key) {
@@ -338,6 +342,10 @@ function markerLabel(key) {
   return subtype ? `${SUBTYPE_SYMBOL[subtype]}\n${h.houseNumber}` : h.houseNumber;
 }
 
+function markerBorder(key) {
+  return statuses[key]?.status ? '2px solid rgba(0,0,0,0.3)' : '2.5px solid #FFC107';
+}
+
 function makeMarkerEl(key) {
   const el = document.createElement('div');
   el.style.cssText = [
@@ -345,10 +353,10 @@ function makeMarkerEl(key) {
     'display:flex','align-items:center','justify-content:center',
     'font-size:9px','font-weight:700','line-height:1.1','text-align:center',
     'color:white','white-space:pre','cursor:pointer',
-    'border:2px solid rgba(0,0,0,0.3)',
     'box-shadow:0 2px 6px rgba(0,0,0,0.35)',
   ].join(';');
   el.style.background = markerColor(key);
+  el.style.border = markerBorder(key);
   el.textContent = markerLabel(key);
   el.addEventListener('click', e => { e.stopPropagation(); selectHouse(key); });
   return el;
@@ -389,9 +397,10 @@ function fitToHouses() {
 // ─── BUILDING POLYGON SVG OVERLAY ─────────────────────────────────────────────
 function buildingColor(key) {
   const s = statuses[key]?.status;
+  if (!s) return 'rgba(158,158,158,0.55)'; // unchecked — gray
   if (s === 'GREEN') return 'rgba(76,175,80,0.75)';
   if (s === 'RED')   return 'rgba(244,67,54,0.82)';
-  return 'rgba(255,193,7,0.55)';
+  return 'rgba(255,193,7,0.55)'; // explicitly marked UNKNOWN
 }
 
 function redrawBuildingSVG() {
@@ -407,10 +416,12 @@ function redrawBuildingSVG() {
 
     const poly = document.createElementNS(NS, 'polygon');
     poly.setAttribute('points', pts);
+    const unchecked = !statuses[key]?.status;
     poly.setAttribute('fill', color);
     poly.setAttribute('fill-opacity', '0.82');
-    poly.setAttribute('stroke', 'rgba(0,0,0,0.45)');
-    poly.setAttribute('stroke-width', '1.5');
+    // Unchecked buildings get a yellow outline to distinguish from non-assigned gray buildings
+    poly.setAttribute('stroke', unchecked ? '#FFC107' : 'rgba(0,0,0,0.45)');
+    poly.setAttribute('stroke-width', unchecked ? '2.5' : '1.5');
     poly.style.pointerEvents = 'all';
     poly.style.cursor = 'pointer';
     poly.addEventListener('click', e => { e.stopPropagation(); selectHouse(key); });
@@ -625,17 +636,19 @@ function setSyncStatus(msg, cls) {
 
 // ─── COUNTS ───────────────────────────────────────────────────────────────────
 function updateCounts() {
-  let g=0, r=0, u=0;
+  let g=0, r=0, u=0, uc=0;
   houses.forEach(h => {
-    const s = statuses[h.key]?.status || 'UNKNOWN';
-    if (s==='GREEN') g++;
+    const s = statuses[h.key]?.status;
+    if (!s) uc++;
+    else if (s==='GREEN') g++;
     else if (s==='RED') r++;
     else u++;
   });
-  document.getElementById('cnt-green').textContent = g;
-  document.getElementById('cnt-red').textContent   = r;
-  document.getElementById('cnt-unk').textContent   = u;
-  document.getElementById('cnt-total').textContent = houses.length;
+  document.getElementById('cnt-green').textContent     = g;
+  document.getElementById('cnt-red').textContent       = r;
+  document.getElementById('cnt-unk').textContent       = u;
+  document.getElementById('cnt-unchecked').textContent = uc;
+  document.getElementById('cnt-total').textContent     = houses.length;
 }
 
 // ─── SIDEBAR LIST ─────────────────────────────────────────────────────────────
@@ -650,21 +663,24 @@ function renderList() {
   const list = document.getElementById('house-list');
   const toShow = houses.filter(h => {
     if (currentFilter === 'all') return true;
-    return (statuses[h.key]?.status || 'UNKNOWN') === currentFilter;
+    const hs = statuses[h.key]?.status || null;
+    if (currentFilter === 'UNCHECKED') return !hs;
+    if (currentFilter === 'UNKNOWN') return hs === 'UNKNOWN';
+    return hs === currentFilter;
   });
   toShow.sort((a, b) => {
-    const order = {RED:0, UNKNOWN:1, GREEN:2};
-    const sa = order[statuses[a.key]?.status || 'UNKNOWN'];
-    const sb = order[statuses[b.key]?.status || 'UNKNOWN'];
+    const order = {RED:0, UNKNOWN:1, UNCHECKED:2, GREEN:3};
+    const sa = order[statuses[a.key]?.status || 'UNCHECKED'] ?? 2;
+    const sb = order[statuses[b.key]?.status || 'UNCHECKED'] ?? 2;
     return sa - sb;
   });
 
   list.innerHTML = '';
   toShow.forEach(h => {
     const s = statuses[h.key];
-    const status = s?.status || 'UNKNOWN';
-    const dotClass = {GREEN:'green', RED:'red', UNKNOWN:'gray'}[status];
-    const statusLabel = {GREEN:'Okay', RED:'Needs Help', UNKNOWN:'Unknown'}[status];
+    const status = s?.status || 'UNCHECKED';
+    const dotClass = {GREEN:'green', RED:'red', UNKNOWN:'gray', UNCHECKED:'unchecked'}[status] || 'unchecked';
+    const statusLabel = {GREEN:'Okay', RED:'Needs Help', UNKNOWN:'Unknown', UNCHECKED:'Unchecked'}[status] || 'Unchecked';
     const sym = s?.subtype ? ` ${SUBTYPE_SYMBOL[s.subtype]}` : '';
     const captain = s?.captain ? ` · ${s.captain}` : '';
 
@@ -693,7 +709,9 @@ function selectHouse(key) {
   panel.classList.add('visible');
   document.getElementById('detail-addr').textContent = `${h?.houseNumber} ${h?.street}`;
 
-  const statusLabel = {GREEN:'✅ Okay', RED:'🆘 Needs Help', UNKNOWN:'❓ Unknown'}[s?.status||'UNKNOWN'];
+  const statusLabel = s?.status
+    ? {GREEN:'✅ Okay', RED:'🆘 Needs Help', UNKNOWN:'❓ Unknown'}[s.status]
+    : '⬜ Unchecked';
   document.getElementById('detail-status').textContent = statusLabel;
 
   const subtypeRow = document.getElementById('detail-subtype-row');

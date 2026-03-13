@@ -43,10 +43,12 @@ html, body { height: 100%; overflow: hidden; font-family: system-ui, -apple-syst
 .stat-pill.green { background: rgba(76,175,80,0.3); color: #81c784; }
 .stat-pill.red   { background: rgba(244,67,54,0.3);  color: #e57373; }
 .stat-pill.gray  { background: rgba(255,193,7,0.25); color: #ffd54f; }
+.stat-pill.unchecked { background: rgba(158,158,158,0.25); color: #bdbdbd; }
 .dot-sm { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
 .dot-green { background: #4CAF50; }
 .dot-red   { background: #f44336; }
 .dot-gray  { background: #FFC107; }
+.dot-unchecked { background: #9E9E9E; }
 
 .sync-indicator {
   margin-left: auto; font-size: 0.68rem; color: #aaa;
@@ -265,13 +267,14 @@ html, body { height: 100%; overflow: hidden; font-family: system-ui, -apple-syst
     <div class="stat-pill green"><div class="dot-sm dot-green"></div><span id="count-green">0</span> Okay</div>
     <div class="stat-pill red"  ><div class="dot-sm dot-red"></div>  <span id="count-red">0</span> Needs Help</div>
     <div class="stat-pill gray" ><div class="dot-sm dot-gray"></div> <span id="count-unknown">0</span> Unknown</div>
+    <div class="stat-pill unchecked"><div class="dot-sm dot-unchecked"></div> <span id="count-unchecked">0</span> Unchecked</div>
   </div>
 </div>
 
 <!-- FAB BUTTONS -->
 <div id="fab-group">
   <button class="fab blue" onclick="showReport()">
-    <span class="fab-icon">📋</span> Report
+    <span class="fab-icon">📋</span> View Report
   </button>
   <button class="fab teal" onclick="showOfflineModal()">
     <span class="fab-icon">⬇</span> Save Offline
@@ -334,6 +337,19 @@ html, body { height: 100%; overflow: hidden; font-family: system-ui, -apple-syst
   </div>
 </div>
 
+<!-- NEW EMERGENCY PROMPT (custom modal — avoids browser confirm() which shows the page URL) -->
+<div id="new-emergency-modal" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;">
+  <div style="background:white;border-radius:12px;padding:24px 22px;max-width:340px;width:90%;text-align:center;box-shadow:0 8px 30px rgba(0,0,0,0.4);">
+    <div style="font-size:1.5rem;margin-bottom:8px;">🚨</div>
+    <div style="font-weight:700;font-size:1rem;margin-bottom:6px;">Emergency Communications</div>
+    <div id="new-emergency-msg" style="font-size:0.85rem;color:#444;line-height:1.5;margin-bottom:18px;"></div>
+    <div style="display:flex;gap:10px;justify-content:center;">
+      <button onclick="confirmNewEmergency(true)" style="flex:1;padding:10px;border:none;border-radius:8px;background:#d32f2f;color:white;font-weight:700;font-size:0.9rem;cursor:pointer;">New Emergency</button>
+      <button onclick="confirmNewEmergency(false)" style="flex:1;padding:10px;border:none;border-radius:8px;background:#1565C0;color:white;font-weight:700;font-size:0.9rem;cursor:pointer;">Keep Data</button>
+    </div>
+  </div>
+</div>
+
 <!-- SAVE OFFLINE MODAL -->
 <div id="offline-modal">
   <div class="modal-box">
@@ -346,6 +362,13 @@ html, body { height: 100%; overflow: hidden; font-family: system-ui, -apple-syst
     <div class="modal-buttons">
       <button class="modal-btn-start" id="offline-btn-start" onclick="downloadTiles()">Download Tiles</button>
       <button class="modal-btn-cancel" onclick="hideOfflineModal()">Close</button>
+    </div>
+    <!-- How to find this form again after saving offline -->
+    <div style="margin-top:14px;padding:10px 12px;background:#f0f4ff;border-radius:8px;font-size:0.78rem;line-height:1.5;color:#333;">
+      <b>📌 How to find this form again</b><br>
+      <b>iPhone:</b> Tap Share (□↑) → "Add to Home Screen" — it will appear as an app icon on your home screen.<br>
+      <b>Android:</b> Tap ⋮ menu → "Add to Home Screen" — same result.<br>
+      <b>Map tiles</b> are saved in your browser's cache and stay available offline as long as you open the form from the same browser (or home screen icon). <em>Do not clear browser data before an emergency.</em>
     </div>
   </div>
 </div>
@@ -503,24 +526,27 @@ let activeStatus = null;
 let activeSubtype = null;
 
 // ─── NEW EMERGENCY PROMPT ─────────────────────────────────────────────────────
-// Runs on page load. If captain has saved data from a prior session, asks whether
-// this is a new emergency. Uses s?.updatedAt (not s.updatedAt) because localStorage
-// can return null values that would throw if accessed directly. Wrapped in try/catch
-// to handle any corrupt stored data.
+// Uses a custom modal instead of window.confirm() to avoid showing the page URL,
+// which confused captains who mistook it for a phone message.
+let _newEmergencyResolve = null;
+
+function confirmNewEmergency(isNew) {
+  document.getElementById('new-emergency-modal').style.display = 'none';
+  if (isNew) { statuses = {}; saveState(statuses); }
+  if (_newEmergencyResolve) _newEmergencyResolve();
+}
+
 (function checkNewEmergency() {
-  if (Object.keys(statuses).length === 0) return; // no saved data, skip prompt
+  if (Object.keys(statuses).length === 0) return;
   try {
-  const last = Object.values(statuses).map(s => s?.updatedAt).filter(Boolean).sort().pop();
-  const age  = last ? Math.round((Date.now() - new Date(last)) / 3600000) : null;
-  const msg  = age !== null
-    ? `You have saved data from ~${age} hour${age !== 1 ? 's' : ''} ago.\n\nIs this a NEW emergency? (OK = clear data and start fresh\nCancel = keep your existing data)`
-    : 'You have saved data from a previous session.\n\nIs this a NEW emergency? (OK = clear data\nCancel = keep existing data)';
-  if (window.confirm(msg)) {
-    statuses = {};
-    saveState(statuses);
-  }
+    const last = Object.values(statuses).map(s => s?.updatedAt).filter(Boolean).sort().pop();
+    const age  = last ? Math.round((Date.now() - new Date(last)) / 3600000) : null;
+    const msg  = age !== null
+      ? `You have saved data from ~${age} hour${age !== 1 ? 's' : ''} ago.\n\nIs this a NEW emergency?\nTap "New Emergency" to clear all data and start fresh.\nTap "Keep Data" to resume where you left off.`
+      : 'You have saved data from a previous session.\n\nIs this a NEW emergency?\nTap "New Emergency" to clear all data.\nTap "Keep Data" to resume where you left off.';
+    document.getElementById('new-emergency-msg').textContent = msg;
+    document.getElementById('new-emergency-modal').style.display = 'flex';
   } catch(e) {
-    // Corrupt saved data — reset to be safe
     statuses = {};
     saveState(statuses);
   }
@@ -548,16 +574,22 @@ const map = new maplibregl.Map({
 const houseMarkers = {}; // key → { marker, el }
 
 function markerColor(key) {
-  const s = statuses[key]?.status || 'UNKNOWN';
+  const s = statuses[key]?.status;
+  if (!s) return '#9E9E9E'; // unchecked — gray
   return s === 'GREEN' ? '#4CAF50' : s === 'RED' ? '#f44336' : '#FFC107';
 }
 
 function markerLabel(key) {
   const s = statuses[key];
-  const status = s?.status || 'UNKNOWN';
+  const status = s?.status;
   const subtype = status === 'RED' ? (s?.subtype || null) : null;
   const h = HOUSES.find(x => x.key === key);
   return subtype ? `${SUBTYPE_SYMBOL[subtype]}\n${h.houseNumber}` : h.houseNumber;
+}
+
+function markerBorder(key) {
+  // Unchecked houses get a yellow outline so captains can spot them among other gray buildings
+  return statuses[key]?.status ? '2px solid rgba(0,0,0,0.3)' : '2.5px solid #FFC107';
 }
 
 function makeMarkerEl(key) {
@@ -567,10 +599,10 @@ function makeMarkerEl(key) {
     'display:flex','align-items:center','justify-content:center',
     'font-size:10px','font-weight:700','line-height:1.1','text-align:center',
     'color:white','white-space:pre','cursor:pointer',
-    'border:2px solid rgba(0,0,0,0.3)',
     'box-shadow:0 2px 6px rgba(0,0,0,0.35)',
   ].join(';');
   el.style.background = markerColor(key);
+  el.style.border = markerBorder(key);
   el.textContent = markerLabel(key);
   el.addEventListener('click', e => { e.stopPropagation(); openSheet(key); });
   return el;
@@ -624,7 +656,8 @@ bldgSvg.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;p
 document.getElementById('map').appendChild(bldgSvg);
 
 function buildingColor(key) {
-  const s = statuses[key]?.status || 'UNKNOWN';
+  const s = statuses[key]?.status;
+  if (!s) return '#9E9E9E'; // unchecked — gray
   return s === 'GREEN' ? '#4CAF50' : s === 'RED' ? '#f44336' : '#FFC107';
 }
 
@@ -644,10 +677,12 @@ function redrawBuildingSVG() {
     const pts = b.coords.map(c => { const p = map.project(c); return `${p.x},${p.y}`; }).join(' ');
     const poly = document.createElementNS(NS, 'polygon');
     poly.setAttribute('points', pts);
+    const unchecked = !statuses[key]?.status;
     poly.setAttribute('fill', color);
     poly.setAttribute('fill-opacity', '0.82');
-    poly.setAttribute('stroke', 'rgba(0,0,0,0.45)');
-    poly.setAttribute('stroke-width', '1.5');
+    // Unchecked buildings get a yellow outline so captains can spot their assigned houses
+    poly.setAttribute('stroke', unchecked ? '#FFC107' : 'rgba(0,0,0,0.45)');
+    poly.setAttribute('stroke-width', unchecked ? '2.5' : '1.5');
     poly.style.pointerEvents = 'all';
     poly.style.cursor = 'pointer';
     poly.addEventListener('click', e => { e.stopPropagation(); openSheet(key); });
@@ -688,11 +723,12 @@ map.on('zoom', redrawBuildingSVG);
 
 function updateHouseLayer() {
   redrawBuildingSVG();
-  // Also update circle colors for unmatched houses
+  // Also update circle colors/borders for unmatched houses
   HOUSES.forEach(h => {
     const m = houseMarkers[h.key];
     if (!m) return;
     m.el.style.background = markerColor(h.key);
+    m.el.style.border = markerBorder(h.key);
     m.el.textContent = markerLabel(h.key);
   });
 }
@@ -822,16 +858,18 @@ function saveStatus() {
 
 // ─── STATUS COUNTS ────────────────────────────────────────────────────────────
 function updateCounts() {
-  let green = 0, red = 0, unknown = 0;
+  let green = 0, red = 0, unknown = 0, unchecked = 0;
   HOUSES.forEach(h => {
-    const s = statuses[h.key]?.status || 'UNKNOWN';
-    if (s === 'GREEN') green++;
+    const s = statuses[h.key]?.status;
+    if (!s) unchecked++;
+    else if (s === 'GREEN') green++;
     else if (s === 'RED') red++;
-    else unknown++;
+    else unknown++; // explicitly marked UNKNOWN
   });
-  document.getElementById('count-green').textContent   = green;
-  document.getElementById('count-red').textContent     = red;
-  document.getElementById('count-unknown').textContent = unknown;
+  document.getElementById('count-green').textContent     = green;
+  document.getElementById('count-red').textContent       = red;
+  document.getElementById('count-unknown').textContent   = unknown;
+  document.getElementById('count-unchecked').textContent = unchecked;
 }
 
 // ─── SUPABASE SYNC ────────────────────────────────────────────────────────────
@@ -899,7 +937,7 @@ function showToast(msg, type) {
   t.style.color = 'white';
   t.style.opacity = '1';
   clearTimeout(t._timer);
-  t._timer = setTimeout(() => { t.style.opacity = '0'; }, 4000);
+  t._timer = setTimeout(() => { t.style.opacity = '0'; }, 7000);
 }
 
 async function syncAllPending() {
@@ -922,15 +960,16 @@ function updateSyncIndicator(state) {
 // ─── REPORT ───────────────────────────────────────────────────────────────────
 function buildReportText() {
   const now = new Date().toLocaleString('en-US', { month:'short', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit' });
-  const green = [], red = [], unknown = [];
+  const green = [], red = [], unknown = [], unchecked = [];
 
   HOUSES.forEach(h => {
     const s = statuses[h.key];
-    const st = s?.status || 'UNKNOWN';
+    const st = s?.status;
     const line = `  ${h.houseNumber} ${h.street}` +
       (s?.subtype ? ` [${s.subtype}]` : '') +
       (s?.notes ? ` — "${s.notes}"` : '');
-    if (st === 'GREEN') green.push(line);
+    if (!st) unchecked.push(`  ${h.houseNumber} ${h.street}`);
+    else if (st === 'GREEN') green.push(line);
     else if (st === 'RED') red.push(line);
     else unknown.push(`  ${h.houseNumber} ${h.street}` + (s?.notes ? ` — "${s.notes}"` : ''));
   });
@@ -947,8 +986,10 @@ function buildReportText() {
   report += red.length ? red.join('\n') + '\n' : '  (none)\n';
   report += `\nUNKNOWN (${unknown.length}):\n`;
   report += unknown.length ? unknown.join('\n') + '\n' : '  (none)\n';
+  report += `\nUNCHECKED (${unchecked.length}):\n`;
+  report += unchecked.length ? unchecked.join('\n') + '\n' : '  (none)\n';
   report += `${'─'.repeat(40)}\n`;
-  report += `TOTALS: ${green.length} Okay | ${red.length} Needs Help | ${unknown.length} Unknown\n`;
+  report += `TOTALS: ${green.length} Okay | ${red.length} Needs Help | ${unknown.length} Unknown | ${unchecked.length} Unchecked\n`;
   return report;
 }
 
