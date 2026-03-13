@@ -351,6 +351,14 @@ html, body { height: 100%; overflow: hidden; font-family: system-ui, -apple-syst
 </div>
 
 <script>
+// ─── GLOBAL ERROR DISPLAY ─────────────────────────────────────────────────────
+window.onerror = function(msg, src, line) {
+  const d = document.createElement('div');
+  d.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:#c62828;color:white;padding:10px 14px;font-size:0.85rem;font-weight:700;';
+  d.textContent = `JS Error (line ${line}): ${msg}`;
+  document.body.appendChild(d);
+};
+
 // ─── CAPTAIN DATA (injected by generator) ─────────────────────────────────────
 const CAPTAIN_NAME  = "Dana Holbrook";
 const CAPTAIN_PHONE = "(801) 555-0109";
@@ -494,12 +502,18 @@ let activeSubtype = null;
 // ─── NEW EMERGENCY PROMPT ─────────────────────────────────────────────────────
 (function checkNewEmergency() {
   if (Object.keys(statuses).length === 0) return; // no saved data, skip prompt
-  const last = Object.values(statuses).map(s => s.updatedAt).filter(Boolean).sort().pop();
+  try {
+  const last = Object.values(statuses).map(s => s?.updatedAt).filter(Boolean).sort().pop();
   const age  = last ? Math.round((Date.now() - new Date(last)) / 3600000) : null;
   const msg  = age !== null
     ? `You have saved data from ~${age} hour${age !== 1 ? 's' : ''} ago.\n\nIs this a NEW emergency? (OK = clear data and start fresh\nCancel = keep your existing data)`
     : 'You have saved data from a previous session.\n\nIs this a NEW emergency? (OK = clear data\nCancel = keep existing data)';
   if (window.confirm(msg)) {
+    statuses = {};
+    saveState(statuses);
+  }
+  } catch(e) {
+    // Corrupt saved data — reset to be safe
     statuses = {};
     saveState(statuses);
   }
