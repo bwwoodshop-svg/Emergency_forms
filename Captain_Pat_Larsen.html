@@ -724,7 +724,7 @@ map.on('load', () => { dbgLog('map load event fired'); initHouseLayers(); });
 // as an SVG element layered directly on the map container. SVG is pure DOM — always works.
 // Overpass API fetches OSM footprints once; result is cached in localStorage.
 const houseBuildingGeom = {}; // key → { coords: [[lng,lat],...], centLng, centLat }
-const BLDG_CACHE_KEY = `flint_buildings_${CAPTAIN_NAME.replace(/\s+/g,'_')}`;
+const BLDG_CACHE_KEY = `flint_buildings_v2_${CAPTAIN_NAME.replace(/\s+/g,'_')}`;
 
 // Create SVG canvas that covers the map exactly
 const bldgSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -745,6 +745,7 @@ function redrawBuildingSVG() {
   let firstCoord = '';
   Object.keys(houseBuildingGeom).forEach((key, i) => {
     const b = houseBuildingGeom[key];
+    if (!b || !b.coords) return; // skip malformed cache entries
     const color = buildingColor(key);
     const s = statuses[key];
     const status = s?.status || 'UNKNOWN';
