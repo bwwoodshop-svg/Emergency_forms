@@ -358,6 +358,12 @@ window.onerror = function(msg, src, line) {
   d.textContent = `JS Error (line ${line}): ${msg}`;
   document.body.appendChild(d);
 };
+window.addEventListener('unhandledrejection', e => {
+  const d = document.createElement('div');
+  d.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:#c62828;color:white;padding:10px 14px;font-size:0.85rem;font-weight:700;';
+  d.textContent = `Async Error: ${e.reason?.message || e.reason}`;
+  document.body.appendChild(d);
+});
 
 // ─── CAPTAIN DATA (injected by generator) ─────────────────────────────────────
 const CAPTAIN_NAME  = "Dana Holbrook";
@@ -629,6 +635,7 @@ let svgRedrawCount = 0;
 function redrawBuildingSVG() {
   svgRedrawCount++;
   bldgSvg.innerHTML = '';
+  try {
   const NS = 'http://www.w3.org/2000/svg';
   let firstCoord = '';
   Object.keys(houseBuildingGeom).forEach((key, i) => {
@@ -681,6 +688,7 @@ function redrawBuildingSVG() {
     }
   });
   dbgLog(`SVG#${svgRedrawCount}: ${bldgSvg.children.length} els, first pt: ${firstCoord}`);
+  } catch(e) { dbgLog(`SVG#${svgRedrawCount} ERROR: ${e.message}`); }
 }
 
 // Redraw SVG whenever map moves or zooms
