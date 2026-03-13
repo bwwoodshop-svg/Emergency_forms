@@ -1,0 +1,1532 @@
+[
+  {
+    "street": "W. 200 North",
+    "houseNumber": "1820",
+    "key": "W. 200 North|1820",
+    "lat": 41.0385901,
+    "lng": -111.972962,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "W. 200 North",
+    "houseNumber": "1772",
+    "key": "W. 200 North|1772",
+    "lat": 41.0385578,
+    "lng": -111.9710898,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "W. 200 North",
+    "houseNumber": "1740",
+    "key": "W. 200 North|1740",
+    "lat": 41.0385578,
+    "lng": -111.9707465,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "W. 200 North",
+    "houseNumber": "1722",
+    "key": "W. 200 North|1722",
+    "lat": 41.0385658,
+    "lng": -111.9703496,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "W. 200 North",
+    "houseNumber": "1698",
+    "key": "W. 200 North|1698",
+    "lat": 41.038582,
+    "lng": -111.9699848,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "W. 200 North",
+    "houseNumber": "1670",
+    "key": "W. 200 North|1670",
+    "lat": 41.039055,
+    "lng": -111.9696629,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "W. 200 North",
+    "houseNumber": "1632",
+    "key": "W. 200 North|1632",
+    "lat": 41.0385416,
+    "lng": -111.9693357,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "W. Phillips Street",
+    "houseNumber": "1576",
+    "key": "W. Phillips Street|1576",
+    "lat": 41.0452579,
+    "lng": -111.9711113,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "W. Phillips Street",
+    "houseNumber": "1592",
+    "key": "W. Phillips Street|1592",
+    "lat": 41.0451446,
+    "lng": -111.9713312,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Carriage Ln.",
+    "houseNumber": "403",
+    "key": "Carriage Ln.|403",
+    "lat": 41.0415409,
+    "lng": -111.9738954,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Carriage Ln.",
+    "houseNumber": "421",
+    "key": "Carriage Ln.|421",
+    "lat": 41.0416057,
+    "lng": -111.9736165,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Carriage Ln.",
+    "houseNumber": "431",
+    "key": "Carriage Ln.|431",
+    "lat": 41.0417592,
+    "lng": -111.9733858,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Carriage Ln.",
+    "houseNumber": "445",
+    "key": "Carriage Ln.|445",
+    "lat": 41.0420988,
+    "lng": -111.9730264,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Carriage Ln.",
+    "houseNumber": "446",
+    "key": "Carriage Ln.|446",
+    "lat": 41.0420992,
+    "lng": -111.9728065,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Carriage Ln.",
+    "houseNumber": "457",
+    "key": "Carriage Ln.|457",
+    "lat": 41.0424429,
+    "lng": -111.9729942,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Carriage Ln.",
+    "houseNumber": "462",
+    "key": "Carriage Ln.|462",
+    "lat": 41.0425397,
+    "lng": -111.9727474,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Carriage Ln.",
+    "houseNumber": "469",
+    "key": "Carriage Ln.|469",
+    "lat": 41.0427379,
+    "lng": -111.973021,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Carriage Ln.",
+    "houseNumber": "486",
+    "key": "Carriage Ln.|486",
+    "lat": 41.0431056,
+    "lng": -111.9727099,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Willow Dr.",
+    "houseNumber": "1609",
+    "key": "Willow Dr.|1609",
+    "lat": 41.042763,
+    "lng": -111.9719803,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": false
+  },
+  {
+    "street": "Carriage Ln.",
+    "houseNumber": "1841",
+    "key": "Carriage Ln.|1841",
+    "lat": 41.0407754,
+    "lng": -111.9729668,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": false
+  },
+  {
+    "street": "Carriage Ln.",
+    "houseNumber": "1853",
+    "key": "Carriage Ln.|1853",
+    "lat": 41.0408963,
+    "lng": -111.9732034,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Carriage Ln.",
+    "houseNumber": "1854",
+    "key": "Carriage Ln.|1854",
+    "lat": 41.0408803,
+    "lng": -111.9728601,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Carriage Ln.",
+    "houseNumber": "1865",
+    "key": "Carriage Ln.|1865",
+    "lat": 41.0410459,
+    "lng": -111.9734395,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Carriage Ln.",
+    "houseNumber": "1868",
+    "key": "Carriage Ln.|1868",
+    "lat": 41.0410702,
+    "lng": -111.9731551,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Carriage Ln.",
+    "houseNumber": "1877",
+    "key": "Carriage Ln.|1877",
+    "lat": 41.041224,
+    "lng": -111.9736272,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Carriage Ln.",
+    "houseNumber": "1882",
+    "key": "Carriage Ln.|1882",
+    "lat": 41.0413006,
+    "lng": -111.9734663,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Carriage Ln.",
+    "houseNumber": "481",
+    "key": "Carriage Ln.|481",
+    "lat": 41.0430128,
+    "lng": -111.9729996,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Carriage Ln.",
+    "houseNumber": "1889",
+    "key": "Carriage Ln.|1889",
+    "lat": 41.0413739,
+    "lng": -111.9738525,
+    "geocodeStatus": "warn",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "E. Phillips Street",
+    "houseNumber": "10",
+    "key": "E. Phillips Street|10",
+    "lat": 41.0458825,
+    "lng": -111.9674528,
+    "geocodeStatus": "warn",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "E. Phillips Street",
+    "houseNumber": "16",
+    "key": "E. Phillips Street|16",
+    "lat": 41.0461319,
+    "lng": -111.9668627,
+    "geocodeStatus": "warn",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "E. Phillips Street",
+    "houseNumber": "20",
+    "key": "E. Phillips Street|20",
+    "lat": 41.0462618,
+    "lng": -111.9665623,
+    "geocodeStatus": "warn",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "E. Phillips Street",
+    "houseNumber": "30",
+    "key": "E. Phillips Street|30",
+    "lat": 41.0468642,
+    "lng": -111.9652104,
+    "geocodeStatus": "warn",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "E. Phillips Street",
+    "houseNumber": "38B",
+    "key": "E. Phillips Street|38B",
+    "lat": 41.0466423,
+    "lng": -111.9657522,
+    "geocodeStatus": "warn",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "E. Phillips Street",
+    "houseNumber": "38A",
+    "key": "E. Phillips Street|38A",
+    "lat": 41.0467595,
+    "lng": -111.9655001,
+    "geocodeStatus": "warn",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "E. Phillips Street",
+    "houseNumber": "70",
+    "key": "E. Phillips Street|70",
+    "lat": 41.0471113,
+    "lng": -111.9647652,
+    "geocodeStatus": "warn",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "E. Phillips Street",
+    "houseNumber": "92",
+    "key": "E. Phillips Street|92",
+    "lat": 41.0472813,
+    "lng": -111.964336,
+    "geocodeStatus": "warn",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "E. Phillips Street",
+    "houseNumber": "102",
+    "key": "E. Phillips Street|102",
+    "lat": 41.0473699,
+    "lng": -111.9641429,
+    "geocodeStatus": "warn",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "E. Phillips Street",
+    "houseNumber": "115",
+    "key": "E. Phillips Street|115",
+    "lat": 41.0474871,
+    "lng": -111.9642127,
+    "geocodeStatus": "warn",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "E. Phillips Street",
+    "houseNumber": "134",
+    "key": "E. Phillips Street|134",
+    "lat": 41.0474831,
+    "lng": -111.9638908,
+    "geocodeStatus": "warn",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Flint Court",
+    "houseNumber": "1439",
+    "key": "Flint Court|1439",
+    "lat": 41.0423001,
+    "lng": -111.9671738,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Flint Court",
+    "houseNumber": "1444",
+    "key": "Flint Court|1444",
+    "lat": 41.0423851,
+    "lng": -111.9673669,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Flint Court",
+    "houseNumber": "1455",
+    "key": "Flint Court|1455",
+    "lat": 41.0421222,
+    "lng": -111.9672972,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Flint Court",
+    "houseNumber": "1466",
+    "key": "Flint Court|1466",
+    "lat": 41.0421748,
+    "lng": -111.9676405,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Flint Court",
+    "houseNumber": "1477",
+    "key": "Flint Court|1477",
+    "lat": 41.0419361,
+    "lng": -111.9676459,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Flint Meadows Dr.",
+    "houseNumber": "1424",
+    "key": "Flint Meadows Dr.|1424",
+    "lat": 41.0435583,
+    "lng": -111.9674045,
+    "geocodeStatus": "warn",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Flint Meadows Dr.",
+    "houseNumber": "1429",
+    "key": "Flint Meadows Dr.|1429",
+    "lat": 41.0434128,
+    "lng": -111.9673079,
+    "geocodeStatus": "warn",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Flint Meadows Dr.",
+    "houseNumber": "1446",
+    "key": "Flint Meadows Dr.|1446",
+    "lat": 41.0433401,
+    "lng": -111.9676888,
+    "geocodeStatus": "warn",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Flint Meadows Dr.",
+    "houseNumber": "1451",
+    "key": "Flint Meadows Dr.|1451",
+    "lat": 41.0431704,
+    "lng": -111.9676137,
+    "geocodeStatus": "warn",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Flint Meadows Dr.",
+    "houseNumber": "1468",
+    "key": "Flint Meadows Dr.|1468",
+    "lat": 41.0430814,
+    "lng": -111.9680965,
+    "geocodeStatus": "warn",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Flint Meadows Dr.",
+    "houseNumber": "1480",
+    "key": "Flint Meadows Dr.|1480",
+    "lat": 41.0428952,
+    "lng": -111.9684505,
+    "geocodeStatus": "warn",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Flint Meadows Dr.",
+    "houseNumber": "1480",
+    "key": "Flint Meadows Dr.|1480",
+    "lat": 41.0428506,
+    "lng": -111.9685203,
+    "geocodeStatus": "warn",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Flint Meadows Dr.",
+    "houseNumber": "1496",
+    "key": "Flint Meadows Dr.|1496",
+    "lat": 41.042697,
+    "lng": -111.968767,
+    "geocodeStatus": "warn",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Flint Meadows Dr.",
+    "houseNumber": "1473",
+    "key": "Flint Meadows Dr.|1473",
+    "lat": 41.0429436,
+    "lng": -111.9679677,
+    "geocodeStatus": "warn",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Flint Meadows Dr.",
+    "houseNumber": "1485",
+    "key": "Flint Meadows Dr.|1485",
+    "lat": 41.0428119,
+    "lng": -111.9682521,
+    "geocodeStatus": "warn",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Flint Court",
+    "houseNumber": "1488",
+    "key": "Flint Court|1488",
+    "lat": 41.0419241,
+    "lng": -111.9679946,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Pleasant View Dr.",
+    "houseNumber": "456",
+    "key": "Pleasant View Dr.|456",
+    "lat": 41.0423003,
+    "lng": -111.9687027,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Pleasant View Dr.",
+    "houseNumber": "378",
+    "key": "Pleasant View Dr.|378",
+    "lat": 41.0415159,
+    "lng": -111.968125,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": false
+  },
+  {
+    "street": "Pleasant View Dr.",
+    "houseNumber": "379",
+    "key": "Pleasant View Dr.|379",
+    "lat": 41.0412446,
+    "lng": -111.9682199,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Flint Street",
+    "houseNumber": "691",
+    "key": "Flint Street|691",
+    "lat": 41.0464097,
+    "lng": -111.9681072,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Flint Street",
+    "houseNumber": "683",
+    "key": "Flint Street|683",
+    "lat": 41.0460344,
+    "lng": -111.9678926,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Flint Street",
+    "houseNumber": "671",
+    "key": "Flint Street|671",
+    "lat": 41.0457838,
+    "lng": -111.9677478,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Flint Street",
+    "houseNumber": "657",
+    "key": "Flint Street|657",
+    "lat": 41.0454886,
+    "lng": -111.9676244,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Flint Street",
+    "houseNumber": "627",
+    "key": "Flint Street|627",
+    "lat": 41.0451891,
+    "lng": -111.9674313,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Flint Street",
+    "houseNumber": "624",
+    "key": "Flint Street|624",
+    "lat": 41.0454234,
+    "lng": -111.9672811,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Flint Street",
+    "houseNumber": "600",
+    "key": "Flint Street|600",
+    "lat": 41.0450798,
+    "lng": -111.9671255,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Flint Street",
+    "houseNumber": "593",
+    "key": "Flint Street|593",
+    "lat": 41.044427,
+    "lng": -111.967046,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": false
+  },
+  {
+    "street": "Flint Street",
+    "houseNumber": "577",
+    "key": "Flint Street|577",
+    "lat": 41.0439985,
+    "lng": -111.9668097,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": false
+  },
+  {
+    "street": "Flint Meadows Dr.",
+    "houseNumber": "1407",
+    "key": "Flint Meadows Dr.|1407",
+    "lat": 41.0436394,
+    "lng": -111.9669002,
+    "geocodeStatus": "warn",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Flint Street",
+    "houseNumber": "515",
+    "key": "Flint Street|515",
+    "lat": 41.0432307,
+    "lng": -111.9664013,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Flint Street",
+    "houseNumber": "489",
+    "key": "Flint Street|489",
+    "lat": 41.0426968,
+    "lng": -111.9660956,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Flint Street",
+    "houseNumber": "454",
+    "key": "Flint Street|454",
+    "lat": 41.0426156,
+    "lng": -111.9657576,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Flint Street",
+    "houseNumber": "412",
+    "key": "Flint Street|412",
+    "lat": 41.0415115,
+    "lng": -111.96513,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Flint Street",
+    "houseNumber": "391",
+    "key": "Flint Street|391",
+    "lat": 41.0413252,
+    "lng": -111.9653606,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Flint Street",
+    "houseNumber": "368",
+    "key": "Flint Street|368",
+    "lat": 41.0411188,
+    "lng": -111.9649476,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Flint Street",
+    "houseNumber": "222",
+    "key": "Flint Street|222",
+    "lat": 41.0388491,
+    "lng": -111.9636708,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "W. Lincoln Way",
+    "houseNumber": "1463",
+    "key": "W. Lincoln Way|1463",
+    "lat": 41.0387278,
+    "lng": -111.9678229,
+    "geocodeStatus": "warn",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "N. Lincoln Way",
+    "houseNumber": "1457",
+    "key": "N. Lincoln Way|1457",
+    "lat": 41.0387321,
+    "lng": -111.9676673,
+    "geocodeStatus": "warn",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "N. Lincoln Way",
+    "houseNumber": "1441",
+    "key": "N. Lincoln Way|1441",
+    "lat": 41.0387362,
+    "lng": -111.9674903,
+    "geocodeStatus": "warn",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "N. Lincoln Way",
+    "houseNumber": "1429",
+    "key": "N. Lincoln Way|1429",
+    "lat": 41.0387483,
+    "lng": -111.9673347,
+    "geocodeStatus": "warn",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "N. Monroe Way",
+    "houseNumber": "1494",
+    "key": "N. Monroe Way|1494",
+    "lat": 41.0388736,
+    "lng": -111.9682574,
+    "geocodeStatus": "warn",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "N. Monroe Way",
+    "houseNumber": "1478",
+    "key": "N. Monroe Way|1478",
+    "lat": 41.0388776,
+    "lng": -111.9681019,
+    "geocodeStatus": "warn",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "N. Monroe Way",
+    "houseNumber": "1466",
+    "key": "N. Monroe Way|1466",
+    "lat": 41.0388736,
+    "lng": -111.9679087,
+    "geocodeStatus": "warn",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "N. Monroe Way",
+    "houseNumber": "1458",
+    "key": "N. Monroe Way|1458",
+    "lat": 41.0388776,
+    "lng": -111.9677317,
+    "geocodeStatus": "warn",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "N. Monroe Way",
+    "houseNumber": "1444",
+    "key": "N. Monroe Way|1444",
+    "lat": 41.0388938,
+    "lng": -111.9674957,
+    "geocodeStatus": "warn",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Pleasant View Dr.",
+    "houseNumber": "529",
+    "key": "Pleasant View Dr.|529",
+    "lat": 41.0432147,
+    "lng": -111.9698238,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Pleasant View Dr.",
+    "houseNumber": "511",
+    "key": "Pleasant View Dr.|511",
+    "lat": 41.0429882,
+    "lng": -111.9695985,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Wilkie St.",
+    "houseNumber": "418",
+    "key": "Wilkie St.|418",
+    "lat": 41.0417618,
+    "lng": -111.9714224,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Wilkie St.",
+    "houseNumber": "410",
+    "key": "Wilkie St.|410",
+    "lat": 41.0415111,
+    "lng": -111.9716907,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Wilkie St.",
+    "houseNumber": "402",
+    "key": "Wilkie St.|402",
+    "lat": 41.0412604,
+    "lng": -111.9719321,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Seemore Dr.",
+    "houseNumber": "371",
+    "key": "Seemore Dr.|371",
+    "lat": 41.0407142,
+    "lng": -111.9703442,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Seemore Dr.",
+    "houseNumber": "357",
+    "key": "Seemore Dr.|357",
+    "lat": 41.0405564,
+    "lng": -111.9706178,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Seemore Dr.",
+    "houseNumber": "343",
+    "key": "Seemore Dr.|343",
+    "lat": 41.0403582,
+    "lng": -111.9708484,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Seemore Dr.",
+    "houseNumber": "332",
+    "key": "Seemore Dr.|332",
+    "lat": 41.0401315,
+    "lng": -111.9707894,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Seemore Dr.",
+    "houseNumber": "329",
+    "key": "Seemore Dr.|329",
+    "lat": 41.0401155,
+    "lng": -111.9711059,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Seemore Dr.",
+    "houseNumber": "311",
+    "key": "Seemore Dr.|311",
+    "lat": 41.039889,
+    "lng": -111.971342,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Seemore Dr.",
+    "houseNumber": "289",
+    "key": "Seemore Dr.|289",
+    "lat": 41.0396486,
+    "lng": -111.971566,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": false
+  },
+  {
+    "street": "Seemore Dr.",
+    "houseNumber": "282",
+    "key": "Seemore Dr.|282",
+    "lat": 41.0396744,
+    "lng": -111.9712561,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Seemore Dr.",
+    "houseNumber": "267",
+    "key": "Seemore Dr.|267",
+    "lat": 41.0394398,
+    "lng": -111.9717765,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Seemore Dr.",
+    "houseNumber": "256",
+    "key": "Seemore Dr.|256",
+    "lat": 41.039456,
+    "lng": -111.9714814,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Seemore Dr.",
+    "houseNumber": "245",
+    "key": "Seemore Dr.|245",
+    "lat": 41.0392415,
+    "lng": -111.9720072,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Seemore Dr.",
+    "houseNumber": "228",
+    "key": "Seemore Dr.|228",
+    "lat": 41.0391888,
+    "lng": -111.9717175,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Seemore Dr.",
+    "houseNumber": "221",
+    "key": "Seemore Dr.|221",
+    "lat": 41.0390028,
+    "lng": -111.9722325,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Willow Dr.",
+    "houseNumber": "1480",
+    "key": "Willow Dr.|1480",
+    "lat": 41.039837,
+    "lng": -111.9692177,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Willow Dr.",
+    "houseNumber": "1485",
+    "key": "Willow Dr.|1485",
+    "lat": 41.0397683,
+    "lng": -111.9694376,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Willow Dr.",
+    "houseNumber": "1493",
+    "key": "Willow Dr.|1493",
+    "lat": 41.0398937,
+    "lng": -111.9695985,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "W. Lincoln Way",
+    "houseNumber": "1519",
+    "key": "W. Lincoln Way|1519",
+    "lat": 41.0387521,
+    "lng": -111.9685739,
+    "geocodeStatus": "warn",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "W. Lincoln Way",
+    "houseNumber": "1507",
+    "key": "W. Lincoln Way|1507",
+    "lat": 41.038748,
+    "lng": -111.9684023,
+    "geocodeStatus": "warn",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "W. Lincoln Way",
+    "houseNumber": "1497",
+    "key": "W. Lincoln Way|1497",
+    "lat": 41.0387561,
+    "lng": -111.9681984,
+    "geocodeStatus": "warn",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "W. Lincoln Way",
+    "houseNumber": "1483",
+    "key": "W. Lincoln Way|1483",
+    "lat": 41.0387399,
+    "lng": -111.9680268,
+    "geocodeStatus": "warn",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "W. Monroe Way",
+    "houseNumber": "1470",
+    "key": "W. Monroe Way|1470",
+    "lat": 41.0394924,
+    "lng": -111.968118,
+    "geocodeStatus": "warn",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "W. Monroe Way",
+    "houseNumber": "1491",
+    "key": "W. Monroe Way|1491",
+    "lat": 41.0393024,
+    "lng": -111.9682091,
+    "geocodeStatus": "warn",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "W. Monroe Way",
+    "houseNumber": "1473",
+    "key": "W. Monroe Way|1473",
+    "lat": 41.039302,
+    "lng": -111.9680053,
+    "geocodeStatus": "warn",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "W. Monroe Way",
+    "houseNumber": "1461",
+    "key": "W. Monroe Way|1461",
+    "lat": 41.0393145,
+    "lng": -111.9677961,
+    "geocodeStatus": "warn",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "W. Monroe Way",
+    "houseNumber": "267",
+    "key": "W. Monroe Way|267",
+    "lat": 41.0393185,
+    "lng": -111.9684184,
+    "geocodeStatus": "warn",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "W. Monroe Way",
+    "houseNumber": "259",
+    "key": "W. Monroe Way|259",
+    "lat": 41.0392134,
+    "lng": -111.9684398,
+    "geocodeStatus": "warn",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "W. Monroe Way",
+    "houseNumber": "251",
+    "key": "W. Monroe Way|251",
+    "lat": 41.0390962,
+    "lng": -111.9684398,
+    "geocodeStatus": "warn",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "W. Monroe Way",
+    "houseNumber": "243",
+    "key": "W. Monroe Way|243",
+    "lat": 41.0389709,
+    "lng": -111.9684237,
+    "geocodeStatus": "warn",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "W. Monroe Way",
+    "houseNumber": "235",
+    "key": "W. Monroe Way|235",
+    "lat": 41.038886,
+    "lng": -111.968413,
+    "geocodeStatus": "warn",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Pleasant View Dr.",
+    "houseNumber": "514",
+    "key": "Pleasant View Dr.|514",
+    "lat": 41.0431295,
+    "lng": -111.9694537,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Pleasant View Dr.",
+    "houseNumber": "536",
+    "key": "Pleasant View Dr.|536",
+    "lat": 41.0433399,
+    "lng": -111.9696575,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Pleasant View Dr.",
+    "houseNumber": "547",
+    "key": "Pleasant View Dr.|547",
+    "lat": 41.0434575,
+    "lng": -111.9700706,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Pleasant View Dr.",
+    "houseNumber": "552",
+    "key": "Pleasant View Dr.|552",
+    "lat": 41.0435705,
+    "lng": -111.9698668,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Pleasant View Dr.",
+    "houseNumber": "565",
+    "key": "Pleasant View Dr.|565",
+    "lat": 41.043599,
+    "lng": -111.9703174,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Pleasant View Dr.",
+    "houseNumber": "568",
+    "key": "Pleasant View Dr.|568",
+    "lat": 41.0438132,
+    "lng": -111.9700277,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Pleasant View Dr.",
+    "houseNumber": "580",
+    "key": "Pleasant View Dr.|580",
+    "lat": 41.0438537,
+    "lng": -111.9702208,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Pleasant View Dr.",
+    "houseNumber": "583",
+    "key": "Pleasant View Dr.|583",
+    "lat": 41.0437488,
+    "lng": -111.9704354,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "W. Phillips Street",
+    "houseNumber": "1501",
+    "key": "W. Phillips Street|1501",
+    "lat": 41.0459943,
+    "lng": -111.9694322,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "W. Phillips Street",
+    "houseNumber": "1517",
+    "key": "W. Phillips Street|1517",
+    "lat": 41.0458644,
+    "lng": -111.9696875,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": false
+  },
+  {
+    "street": "W. Phillips Street",
+    "houseNumber": "1533",
+    "key": "W. Phillips Street|1533",
+    "lat": 41.0456747,
+    "lng": -111.9699955,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "W. Phillips Street",
+    "houseNumber": "1545",
+    "key": "W. Phillips Street|1545",
+    "lat": 41.0454978,
+    "lng": -111.9703183,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": false
+  },
+  {
+    "street": "W. Phillips Street",
+    "houseNumber": "1559",
+    "key": "W. Phillips Street|1559",
+    "lat": 41.0453457,
+    "lng": -111.970578,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": false
+  },
+  {
+    "street": "W. Phillips Street",
+    "houseNumber": "1573",
+    "key": "W. Phillips Street|1573",
+    "lat": 41.0451935,
+    "lng": -111.9708377,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": false
+  },
+  {
+    "street": "W. Phillips Street",
+    "houseNumber": "1587",
+    "key": "W. Phillips Street|1587",
+    "lat": 41.0449789,
+    "lng": -111.9712347,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "W. Phillips Street",
+    "houseNumber": "1603",
+    "key": "W. Phillips Street|1603",
+    "lat": 41.04474,
+    "lng": -111.9716048,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "W. Phillips Street",
+    "houseNumber": "1613",
+    "key": "W. Phillips Street|1613",
+    "lat": 41.0446026,
+    "lng": -111.9718462,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "W. Phillips Street",
+    "houseNumber": "1654",
+    "key": "W. Phillips Street|1654",
+    "lat": 41.0444447,
+    "lng": -111.9724202,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Wilkie St.",
+    "houseNumber": "391",
+    "key": "Wilkie St.|391",
+    "lat": 41.0413577,
+    "lng": -111.9721144,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Wilkie St.",
+    "houseNumber": "394",
+    "key": "Wilkie St.|394",
+    "lat": 41.0410502,
+    "lng": -111.972152,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Wilkie St.",
+    "houseNumber": "407",
+    "key": "Wilkie St.|407",
+    "lat": 41.041661,
+    "lng": -111.9718194,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Wilkie St.",
+    "houseNumber": "415",
+    "key": "Wilkie St.|415",
+    "lat": 41.0419278,
+    "lng": -111.9715083,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Wilkie St.",
+    "houseNumber": "434",
+    "key": "Wilkie St.|434",
+    "lat": 41.041798,
+    "lng": -111.972962,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Wilkie St.",
+    "houseNumber": "374",
+    "key": "Wilkie St.|374",
+    "lat": 41.0408196,
+    "lng": -111.9724095,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Wilkie St.",
+    "houseNumber": "358",
+    "key": "Wilkie St.|358",
+    "lat": 41.0406093,
+    "lng": -111.9726241,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Wilkie St.",
+    "houseNumber": "342",
+    "key": "Wilkie St.|342",
+    "lat": 41.0403826,
+    "lng": -111.9728655,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Wilkie St.",
+    "houseNumber": "326",
+    "key": "Wilkie St.|326",
+    "lat": 41.0401399,
+    "lng": -111.9731069,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Willow Dr.",
+    "houseNumber": "1669",
+    "key": "Willow Dr.|1669",
+    "lat": 41.0437487,
+    "lng": -111.9730049,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Carriage Ln.",
+    "houseNumber": "495",
+    "key": "Carriage Ln.|495",
+    "lat": 41.0432731,
+    "lng": -111.9728153,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": false
+  },
+  {
+    "street": "Willow Dr.",
+    "houseNumber": "1674",
+    "key": "Willow Dr.|1674",
+    "lat": 41.0438701,
+    "lng": -111.9728386,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Willow Dr.",
+    "houseNumber": "1662",
+    "key": "Willow Dr.|1662",
+    "lat": 41.0436719,
+    "lng": -111.9726187,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Willow Dr.",
+    "houseNumber": "1648",
+    "key": "Willow Dr.|1648",
+    "lat": 41.0434412,
+    "lng": -111.9723934,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Willow Dr.",
+    "houseNumber": "1636",
+    "key": "Willow Dr.|1636",
+    "lat": 41.0432632,
+    "lng": -111.9722325,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Willow Dr.",
+    "houseNumber": "1624",
+    "key": "Willow Dr.|1624",
+    "lat": 41.0430246,
+    "lng": -111.9720072,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Willow Dr.",
+    "houseNumber": "1612",
+    "key": "Willow Dr.|1612",
+    "lat": 41.0427981,
+    "lng": -111.9717979,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Willow Dr.",
+    "houseNumber": "1596",
+    "key": "Willow Dr.|1596",
+    "lat": 41.0425884,
+    "lng": -111.9715579,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": false
+  },
+  {
+    "street": "Willow Dr.",
+    "houseNumber": "1588",
+    "key": "Willow Dr.|1588",
+    "lat": 41.0423451,
+    "lng": -111.9713795,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Willow Dr.",
+    "houseNumber": "1576",
+    "key": "Willow Dr.|1576",
+    "lat": 41.0421226,
+    "lng": -111.971181,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Willow Dr.",
+    "houseNumber": "1564",
+    "key": "Willow Dr.|1564",
+    "lat": 41.0419444,
+    "lng": -111.9709986,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Willow Dr.",
+    "houseNumber": "1552",
+    "key": "Willow Dr.|1552",
+    "lat": 41.0417097,
+    "lng": -111.9708163,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Willow Dr.",
+    "houseNumber": "1544",
+    "key": "Willow Dr.|1544",
+    "lat": 41.0414387,
+    "lng": -111.9705749,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Willow Dr.",
+    "houseNumber": "1536",
+    "key": "Willow Dr.|1536",
+    "lat": 41.0412365,
+    "lng": -111.9703764,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Willow Dr.",
+    "houseNumber": "1528",
+    "key": "Willow Dr.|1528",
+    "lat": 41.0410301,
+    "lng": -111.9701886,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Willow Dr.",
+    "houseNumber": "1520",
+    "key": "Willow Dr.|1520",
+    "lat": 41.0408562,
+    "lng": -111.970017,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Willow Dr.",
+    "houseNumber": "1512",
+    "key": "Willow Dr.|1512",
+    "lat": 41.0406214,
+    "lng": -111.9698131,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Willow Dr.",
+    "houseNumber": "1504",
+    "key": "Willow Dr.|1504",
+    "lat": 41.0404314,
+    "lng": -111.9696414,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Willow Dr.",
+    "houseNumber": "1496",
+    "key": "Willow Dr.|1496",
+    "lat": 41.0402333,
+    "lng": -111.969443,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Willow Dr.",
+    "houseNumber": "1488",
+    "key": "Willow Dr.|1488",
+    "lat": 41.0400715,
+    "lng": -111.9692069,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Seemore Dr.",
+    "houseNumber": "350",
+    "key": "Seemore Dr.|350",
+    "lat": 41.0405562,
+    "lng": -111.970253,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Seemore Dr.",
+    "houseNumber": "203",
+    "key": "Seemore Dr.|203",
+    "lat": 41.0403823,
+    "lng": -111.9704944,
+    "geocodeStatus": "warn",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Seemore Dr.",
+    "houseNumber": "203",
+    "key": "Seemore Dr.|203",
+    "lat": 41.0387519,
+    "lng": -111.9723129,
+    "geocodeStatus": "warn",
+    "manuallyAdjusted": true
+  },
+  {
+    "street": "Seemore Dr.",
+    "houseNumber": "206",
+    "key": "Seemore Dr.|206",
+    "lat": 41.0388247,
+    "lng": -111.9720232,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
+  }
+]

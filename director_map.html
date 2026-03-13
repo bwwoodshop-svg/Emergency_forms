@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flint Meadows — Director View</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/maplibre-gl@5.2.0/dist/maplibre-gl.css"/>
+<script src="https://cdn.jsdelivr.net/npm/maplibre-gl@5.2.0/dist/maplibre-gl.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; font-family: system-ui, -apple-system, sans-serif; overflow: hidden; }
+
+/* ── CONFIG SCREEN ────────────────────────────────────────────────────────── */
+#config-screen {
+  position: fixed; inset: 0; z-index: 100;
+  background: #1a1a2e; color: white;
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+}
+#config-screen.hidden { display: none; }
+.config-box {
+  background: #24243e; border-radius: 14px;
+  padding: 28px; max-width: 440px; width: 100%;
+}
+.config-box h2 { font-size: 1.1rem; margin-bottom: 6px; }
+.config-box p  { font-size: 0.82rem; color: #aaa; margin-bottom: 20px; }
+.field-label { font-size: 0.78rem; color: #aaa; margin-bottom: 4px; }
+input[type=text] {
+  width: 100%; padding: 10px 12px;
+  border: 1px solid #444; border-radius: 8px;
+  background: #1a1a2e; color: white;
+  font-size: 0.9rem; margin-bottom: 14px;
+}
+input[type=text]:focus { outline: none; border-color: #4CAF50; }
+.config-note { font-size: 0.75rem; color: #888; margin-bottom: 20px; line-height: 1.4; }
+.config-note a { color: #81c784; }
+button {
+  width: 100%; padding: 12px;
+  background: #4CAF50; color: white;
+  border: none; border-radius: 8px;
+  font-size: 0.9rem; font-weight: 700;
+  cursor: pointer;
+}
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── MAIN VIEW ────────────────────────────────────────────────────────────── */
+#main { display: none; flex-direction: column; height: 100%; }
+#main.visible { display: flex; }
+
+#header {
+  background: #1a1a2e; color: white;
+  padding: 10px 16px;
+  flex-shrink: 0;
+  display: flex; align-items: center; gap: 12px;
+}
+#header h1 { font-size: 1rem; font-weight: 700; }
+.hdr-spacer { flex: 1; }
+.status-pills { display: flex; gap: 8px; }
+.pill {
+  padding: 3px 10px; border-radius: 12px;
+  font-size: 0.75rem; font-weight: 600;
+}
+.pill-green  { background: rgba(76,175,80,0.25); color: #81c784; }
+.pill-red    { background: rgba(244,67,54,0.25);  color: #e57373; }
+.pill-gray   { background: rgba(255,193,7,0.2);  color: #ffd54f; }
+.pill-total  { background: rgba(255,255,255,0.1);  color: #fff; }
+
+.sync-row {
+  background: #111; color: #888;
+  padding: 4px 16px;
+  font-size: 0.72rem;
+  flex-shrink: 0;
+  display: flex; align-items: center; gap: 8px;
+}
+.sync-row.error { color: #e57373; }
+.sync-row.ok    { color: #81c784; }
+#last-updated { margin-left: auto; }
+
+/* ── MAP + SIDEBAR ────────────────────────────────────────────────────────── */
+.map-area { display: flex; flex: 1; overflow: hidden; }
+#map { flex: 1; position: relative; }
+
+.maplibregl-ctrl-attrib { font-size: 0.6rem !important; }
+.maplibregl-ctrl-top-right { top: 6px; right: 6px; }
+
+#sidebar {
+  width: 280px; flex-shrink: 0;
+  display: flex; flex-direction: column;
+  border-left: 1px solid #2a2a3e;
+  background: #18182c; color: #eee;
+  overflow: hidden;
+}
+.sidebar-title {
+  padding: 10px 12px;
+  font-size: 0.78rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.5px;
+  color: #888; border-bottom: 1px solid #2a2a3e;
+  flex-shrink: 0;
+}
+.filter-row {
+  display: flex; gap: 4px; padding: 8px 10px;
+  border-bottom: 1px solid #2a2a3e;
+  flex-shrink: 0;
+}
+.filter-btn {
+  flex: 1; padding: 4px 6px;
+  border: 1px solid #333; border-radius: 10px;
+  background: #24243e; color: #aaa;
+  font-size: 0.72rem; cursor: pointer;
+  text-align: center;
+}
+.filter-btn.active { background: #4CAF50; color: white; border-color: #4CAF50; }
+.filter-btn.active.red  { background: #f44336; border-color: #f44336; }
+.filter-btn.active.gray { background: #FFC107; border-color: #FFC107; color: #333; }
+
+#house-list { flex: 1; overflow-y: auto; padding: 6px; }
+.house-item {
+  padding: 7px 10px; border-radius: 6px; margin-bottom: 3px;
+  font-size: 0.78rem; cursor: pointer; display: flex; gap: 8px; align-items: flex-start;
+  background: #1e1e38; border: 1px solid transparent;
+}
+.house-item:hover { background: #242442; }
+.house-item.selected { border-color: #4CAF50; }
+.house-dot { width: 9px; height: 9px; border-radius: 50%; margin-top: 2px; flex-shrink: 0; }
+.house-dot.green { background: #4CAF50; }
+.house-dot.red   { background: #f44336; }
+.house-dot.gray  { background: #FFC107; }
+.house-info { flex: 1; }
+.house-addr   { font-weight: 600; color: #eee; }
+.house-detail { font-size: 0.7rem; color: #999; margin-top: 1px; }
+.house-notes  { font-size: 0.7rem; color: #aaa; font-style: italic; margin-top: 2px; }
+
+/* Detail panel at bottom of sidebar */
+#detail-panel {
+  border-top: 1px solid #2a2a3e;
+  padding: 12px;
+  display: none;
+  flex-shrink: 0;
+}
+#detail-panel.visible { display: block; }
+#detail-panel h3 { font-size: 0.88rem; margin-bottom: 6px; color: #eee; }
+.detail-row { font-size: 0.75rem; color: #aaa; margin-bottom: 3px; }
+.detail-row b { color: #ccc; }
+
+/* ── LEGEND ────────────────────────────────────────────────────────────────── */
+#legend {
+  position: absolute; bottom: 24px; left: 14px; z-index: 10;
+  background: rgba(26,26,46,0.9); color: white;
+  border-radius: 8px; padding: 10px 14px;
+  font-size: 0.75rem; pointer-events: none;
+}
+.legend-row { display: flex; align-items: center; gap: 7px; margin-bottom: 4px; }
+.legend-row:last-child { margin-bottom: 0; }
+.ldot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<!-- ── CONFIG SCREEN ──────────────────────────────────────────────────────── -->
+<div id="config-screen">
+  <div class="config-box">
+    <h2>🗺 Flint Meadows Director View</h2>
+    <p>Enter your Supabase project details to connect. These are saved in your browser.</p>
+
+    <div class="field-label">Supabase Project URL</div>
+    <input type="text" id="cfg-url" placeholder="https://xxxxxxxxxxxx.supabase.co">
+
+    <div class="field-label">Supabase Anon Key</div>
+    <input type="text" id="cfg-key" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+
+    <div class="field-label">Geodata JSON URL (or leave blank to upload file)</div>
+    <input type="text" id="cfg-geodata" placeholder="https://example.github.io/Emergency_forms/flint_meadows_geodata.json">
+
+    <p class="config-note">
+      Find your URL and anon key at
+      <a href="https://supabase.com/dashboard" target="_blank">supabase.com/dashboard</a>
+      &rarr; Project &rarr; Settings &rarr; API.
+    </p>
+
+    <button onclick="applyConfig()">Connect →</button>
+  </div>
+</div>
+
+<!-- ── MAIN VIEW ──────────────────────────────────────────────────────────── -->
+<div id="main">
+  <div id="header">
+    <h1>🗺 Flint Meadows — Director View</h1>
+    <div class="hdr-spacer"></div>
+    <div class="status-pills">
+      <div class="pill pill-green"><span id="cnt-green">0</span> Okay</div>
+      <div class="pill pill-red"  ><span id="cnt-red">0</span> Needs Help</div>
+      <div class="pill pill-gray" ><span id="cnt-unk">0</span> Unknown</div>
+      <div class="pill pill-total"><span id="cnt-total">0</span> Total</div>
+    </div>
+    <button onclick="resetConfig()" style="width:auto;padding:6px 10px;font-size:0.72rem;background:#333;border-radius:6px;">⚙ Settings</button>
+  </div>
+
+  <div class="sync-row" id="sync-row">
+    <span id="sync-status">Connecting…</span>
+    <span id="last-updated"></span>
+  </div>
+
+  <div class="map-area">
+    <div id="map">
+      <div id="legend">
+        <div class="legend-row"><div class="ldot" style="background:#4CAF50"></div> Okay</div>
+        <div class="legend-row"><div class="ldot" style="background:#f44336"></div> Needs Help</div>
+        <div class="legend-row"><div class="ldot" style="background:#FFC107"></div> Unknown</div>
+      </div>
+    </div>
+
+    <div id="sidebar">
+      <div class="sidebar-title">All Houses</div>
+      <div class="filter-row">
+        <button class="filter-btn active" onclick="setFilter('all',this,'')">All</button>
+        <button class="filter-btn" onclick="setFilter('GREEN',this,'')">Okay</button>
+        <button class="filter-btn" onclick="setFilter('RED',this,'red')">Help</button>
+        <button class="filter-btn" onclick="setFilter('UNKNOWN',this,'gray')">Unknown</button>
+      </div>
+      <div id="house-list"></div>
+      <div id="detail-panel">
+        <h3 id="detail-addr"></h3>
+        <div class="detail-row"><b>Status:</b> <span id="detail-status"></span></div>
+        <div class="detail-row" id="detail-subtype-row" style="display:none"><b>Type:</b> <span id="detail-subtype"></span></div>
+        <div class="detail-row"><b>Captain:</b> <span id="detail-captain"></span></div>
+        <div class="detail-row" id="detail-notes-row" style="display:none"><b>Notes:</b> <span id="detail-notes"></span></div>
+        <div class="detail-row"><b>Updated:</b> <span id="detail-updated"></span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Baked in by deploy_forms.py when deployed to GitHub Pages.
+// If these contain '{{' they are unset (local dev mode) — manual config screen appears instead.
+// Uses anon key (same as captain forms) — safe to deploy publicly since RLS restricts writes.
+const BAKED_SUPABASE_URL = "https://fvbjmgpmjejkappwxgmk.supabase.co";
+const BAKED_SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ2YmptZ3BtamVqa2FwcHd4Z21rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNjQxNTIsImV4cCI6MjA4ODg0MDE1Mn0.TJeR1xAQFrKmpR8wnxmBnPn-ulxlRXyGfY25resm-v0";
+const BAKED_GEODATA_URL  = "https://bwwoodshop-svg.github.io/Emergency_forms/flint_meadows_geodata.json";
+
+const STORAGE_KEY_CONFIG  = 'flintMeadowsDirectorConfig';
+const BLDG_CACHE_KEY      = 'flint_buildings_director_v2'; // v2 busts old cache; bump if format changes
+const SUBTYPE_SYMBOL      = { MED: '🏥', FIRE: '🔥', GAS: '💨' };
+
+let config         = {};
+let houses         = [];      // from geodata: { street, houseNumber, key, lat, lng }
+let statuses       = {};      // key → { status, subtype, notes, captain, updatedAt }
+let houseMarkers   = {};      // key → { marker, el }
+let houseBuildingGeom = {};   // key → { coords, centLng, centLat }
+let currentFilter  = 'all';
+let selectedKey    = null;
+let refreshTimer   = null;
+let map            = null;
+let bldgSvg        = null;
+// mapReady flag: init() can be called before or after map.on('load') fires.
+// placeMarkers() and fitToHouses() check this flag before touching the map.
+let mapReady       = false;
+
+// ─── CONFIG ───────────────────────────────────────────────────────────────────
+function loadConfig() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY_CONFIG) || '{}'); } catch { return {}; }
+}
+function saveConfig(c) {
+  localStorage.setItem(STORAGE_KEY_CONFIG, JSON.stringify(c));
+}
+
+function applyConfig() {
+  const url = document.getElementById('cfg-url').value.trim().replace(/\/$/, '');
+  const key = document.getElementById('cfg-key').value.trim();
+  const geo = document.getElementById('cfg-geodata').value.trim();
+  if (!url || !key) { alert('URL and key are required.'); return; }
+  config = { url, key, geodataUrl: geo };
+  saveConfig(config);
+  document.getElementById('config-screen').classList.add('hidden');
+  document.getElementById('main').classList.add('visible');
+  initMap();
+  init();
+}
+
+function resetConfig() {
+  clearInterval(refreshTimer);
+  config = {};
+  saveConfig({});
+  document.getElementById('cfg-url').value      = '';
+  document.getElementById('cfg-key').value      = '';
+  document.getElementById('cfg-geodata').value  = '';
+  document.getElementById('config-screen').classList.remove('hidden');
+  document.getElementById('main').classList.remove('visible');
+}
+
+// ─── MAP SETUP ────────────────────────────────────────────────────────────────
+// IMPORTANT: Same 'load' event rule as captain forms — never use 'styledata'.
+// MapLibre v5 + OpenFreeMap style: 'https://tiles.openfreemap.org/styles/liberty'
+function initMap() {
+  if (map) return;
+
+  map = new maplibregl.Map({
+    container: 'map',
+    style: 'https://tiles.openfreemap.org/styles/liberty',
+    center: [-111.9690, 41.0400],
+    zoom: 15,
+    minZoom: 13,
+  });
+
+  // SVG overlay for building polygons
+  bldgSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  bldgSvg.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:4;';
+  document.getElementById('map').appendChild(bldgSvg);
+
+  map.on('move', redrawBuildingSVG);
+  map.on('zoom', redrawBuildingSVG);
+
+  map.on('load', () => {
+    mapReady = true;
+    if (houses.length) {
+      placeMarkers();
+      fitToHouses();
+      loadBuildingFootprints(); // if geodata already loaded, fetch buildings now
+    }
+    // If houses not yet loaded, init() will call loadBuildingFootprints() after geodata arrives
+  });
+}
+
+// ─── MARKER COLOR / LABEL ─────────────────────────────────────────────────────
+function markerColor(key) {
+  const s = statuses[key]?.status;
+  if (s === 'GREEN') return '#4CAF50';
+  if (s === 'RED')   return '#f44336';
+  return '#FFC107';
+}
+
+function markerLabel(key) {
+  const s = statuses[key];
+  const status  = s?.status || 'UNKNOWN';
+  const subtype = status === 'RED' ? (s?.subtype || null) : null;
+  const h = houses.find(x => x.key === key);
+  if (!h) return '';
+  return subtype ? `${SUBTYPE_SYMBOL[subtype]}\n${h.houseNumber}` : h.houseNumber;
+}
+
+function makeMarkerEl(key) {
+  const el = document.createElement('div');
+  el.style.cssText = [
+    'width:30px','height:30px','border-radius:50%',
+    'display:flex','align-items:center','justify-content:center',
+    'font-size:9px','font-weight:700','line-height:1.1','text-align:center',
+    'color:white','white-space:pre','cursor:pointer',
+    'border:2px solid rgba(0,0,0,0.3)',
+    'box-shadow:0 2px 6px rgba(0,0,0,0.35)',
+  ].join(';');
+  el.style.background = markerColor(key);
+  el.textContent = markerLabel(key);
+  el.addEventListener('click', e => { e.stopPropagation(); selectHouse(key); });
+  return el;
+}
+
+function placeMarkers() {
+  houses.forEach(h => {
+    if (houseMarkers[h.key]) return; // already placed
+    const el = makeMarkerEl(h.key);
+    const marker = new maplibregl.Marker({ element: el, anchor: 'center' })
+      .setLngLat([h.lng, h.lat])
+      .addTo(map);
+    houseMarkers[h.key] = { marker, el };
+  });
+}
+
+function updateAllMarkers() {
+  houses.forEach(h => {
+    const m = houseMarkers[h.key];
+    if (!m) return;
+    m.el.style.background = markerColor(h.key);
+    m.el.textContent = markerLabel(h.key);
+  });
+  redrawBuildingSVG();
+}
+
+function fitToHouses() {
+  if (!houses.length || map._boundsLocked) return;
+  const lats = houses.map(h => h.lat);
+  const lngs = houses.map(h => h.lng);
+  const minLat = Math.min(...lats), maxLat = Math.max(...lats);
+  const minLng = Math.min(...lngs), maxLng = Math.max(...lngs);
+  map.fitBounds([[minLng, minLat], [maxLng, maxLat]], { padding: 60, maxZoom: 18, animate: false });
+  map.setMaxBounds([[minLng - 0.05, minLat - 0.03], [maxLng + 0.05, maxLat + 0.03]]);
+  map._boundsLocked = true;
+}
+
+// ─── BUILDING POLYGON SVG OVERLAY ─────────────────────────────────────────────
+function buildingColor(key) {
+  const s = statuses[key]?.status;
+  if (s === 'GREEN') return 'rgba(76,175,80,0.75)';
+  if (s === 'RED')   return 'rgba(244,67,54,0.82)';
+  return 'rgba(255,193,7,0.55)';
+}
+
+function redrawBuildingSVG() {
+  if (!bldgSvg || !map) return;
+  bldgSvg.innerHTML = '';
+  const NS = 'http://www.w3.org/2000/svg';
+
+  Object.keys(houseBuildingGeom).forEach(key => {
+    const b = houseBuildingGeom[key];
+    if (!b || !b.coords) return; // guard: skip malformed cache entries (same pattern as captain template)
+    const color = buildingColor(key);
+    const pts = b.coords.map(c => { const p = map.project(c); return `${p.x},${p.y}`; }).join(' ');
+
+    const poly = document.createElementNS(NS, 'polygon');
+    poly.setAttribute('points', pts);
+    poly.setAttribute('fill', color);
+    poly.setAttribute('fill-opacity', '0.82');
+    poly.setAttribute('stroke', 'rgba(0,0,0,0.45)');
+    poly.setAttribute('stroke-width', '1.5');
+    poly.style.pointerEvents = 'all';
+    poly.style.cursor = 'pointer';
+    poly.addEventListener('click', e => { e.stopPropagation(); selectHouse(key); });
+    bldgSvg.appendChild(poly);
+
+    // House number label (always shown)
+    const h = houses.find(x => x.key === key);
+    const cp = map.project([b.centLng, b.centLat]);
+    const s = statuses[key];
+    const subtype = s?.status === 'RED' ? s?.subtype : null;
+
+    if (subtype) {
+      // Symbol on top row, number below
+      const sym = document.createElementNS(NS, 'text');
+      sym.setAttribute('x', cp.x);
+      sym.setAttribute('y', cp.y - 4);
+      sym.setAttribute('text-anchor', 'middle');
+      sym.setAttribute('dominant-baseline', 'middle');
+      sym.setAttribute('font-size', '13');
+      sym.textContent = SUBTYPE_SYMBOL[subtype];
+      sym.style.pointerEvents = 'none';
+      bldgSvg.appendChild(sym);
+
+      const num = document.createElementNS(NS, 'text');
+      num.setAttribute('x', cp.x);
+      num.setAttribute('y', cp.y + 10);
+      num.setAttribute('text-anchor', 'middle');
+      num.setAttribute('dominant-baseline', 'middle');
+      num.setAttribute('font-size', '9');
+      num.setAttribute('font-weight', '700');
+      num.setAttribute('fill', 'white');
+      num.setAttribute('stroke', 'rgba(0,0,0,0.6)');
+      num.setAttribute('stroke-width', '2');
+      num.setAttribute('paint-order', 'stroke');
+      num.textContent = h ? h.houseNumber : '';
+      num.style.pointerEvents = 'none';
+      bldgSvg.appendChild(num);
+    } else {
+      const num = document.createElementNS(NS, 'text');
+      num.setAttribute('x', cp.x);
+      num.setAttribute('y', cp.y);
+      num.setAttribute('text-anchor', 'middle');
+      num.setAttribute('dominant-baseline', 'middle');
+      num.setAttribute('font-size', '9');
+      num.setAttribute('font-weight', '700');
+      num.setAttribute('fill', 'white');
+      num.setAttribute('stroke', 'rgba(0,0,0,0.6)');
+      num.setAttribute('stroke-width', '2');
+      num.setAttribute('paint-order', 'stroke');
+      num.textContent = h ? h.houseNumber : '';
+      num.style.pointerEvents = 'none';
+      bldgSvg.appendChild(num);
+    }
+  });
+}
+
+function applyBuildingFootprints(polygons) {
+  const MATCH_DIST = 0.0006;
+  let matched = 0;
+  houses.forEach(h => {
+    let bestDist = MATCH_DIST, bestPoly = null;
+    polygons.forEach(b => {
+      const d = Math.hypot(b.centLng - h.lng, b.centLat - h.lat);
+      if (d < bestDist) { bestDist = d; bestPoly = b; }
+    });
+    if (bestPoly) {
+      houseBuildingGeom[h.key] = bestPoly;
+      // Hide the circle marker — building polygon takes over display (same as captain template)
+      if (houseMarkers[h.key]) houseMarkers[h.key].el.style.display = 'none';
+      matched++;
+    }
+  });
+  if (matched) redrawBuildingSVG();
+}
+
+async function loadBuildingFootprints() {
+  let polygons = null;
+  const cached = localStorage.getItem(BLDG_CACHE_KEY);
+  if (cached) {
+    try { polygons = JSON.parse(cached); } catch {}
+  }
+
+  if (!polygons) {
+    if (!houses.length) return;
+    const lats = houses.map(h => h.lat);
+    const lngs = houses.map(h => h.lng);
+    const minLat = Math.min(...lats), maxLat = Math.max(...lats);
+    const minLng = Math.min(...lngs), maxLng = Math.max(...lngs);
+    const pad = 0.005;
+    const bbox = `${minLat - pad},${minLng - pad},${maxLat + pad},${maxLng + pad}`;
+    const query = `[out:json][timeout:30];way["building"](${bbox});out geom;`;
+    try {
+      const resp = await fetch('https://overpass-api.de/api/interpreter', { method: 'POST', body: query });
+      if (!resp.ok) return;
+      const data = await resp.json();
+      polygons = data.elements
+        .filter(el => el.type === 'way' && el.geometry && el.geometry.length >= 3)
+        .map(el => {
+          const coords = el.geometry.map(pt => [pt.lon, pt.lat]);
+          if (coords[0][0] !== coords[coords.length-1][0] || coords[0][1] !== coords[coords.length-1][1]) {
+            coords.push(coords[0]);
+          }
+          const lng = coords.reduce((s, c) => s + c[0], 0) / coords.length;
+          const lat = coords.reduce((s, c) => s + c[1], 0) / coords.length;
+          return { lng, lat, centLng: lng, centLat: lat, coords };
+        });
+      localStorage.setItem(BLDG_CACHE_KEY, JSON.stringify(polygons));
+    } catch { return; }
+  }
+
+  if (polygons && polygons.length) applyBuildingFootprints(polygons);
+}
+
+// ─── DATA LOADING ─────────────────────────────────────────────────────────────
+async function loadGeodata() {
+  if (!config.geodataUrl) {
+    return new Promise(resolve => {
+      const overlay = document.createElement('div');
+      overlay.style.cssText = 'position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;';
+      overlay.innerHTML = `
+        <div style="background:#24243e;color:white;border-radius:14px;padding:28px;max-width:380px;width:90%;text-align:center;">
+          <div style="font-size:2rem;margin-bottom:12px;">📂</div>
+          <h3 style="margin-bottom:8px;">Load Map Data</h3>
+          <p style="font-size:0.85rem;color:#aaa;margin-bottom:20px;">Select <b>flint_meadows_geodata.json</b> from your local files.</p>
+          <label style="display:block;padding:12px;background:#4CAF50;border-radius:8px;cursor:pointer;font-weight:700;">
+            Choose File
+            <input type="file" accept=".json" style="display:none;" id="geodata-file-input">
+          </label>
+        </div>`;
+      document.body.appendChild(overlay);
+      overlay.querySelector('#geodata-file-input').onchange = async e => {
+        const text = await e.target.files[0].text();
+        document.body.removeChild(overlay);
+        resolve(JSON.parse(text));
+      };
+    });
+  }
+  const resp = await fetch(config.geodataUrl);
+  return resp.json();
+}
+
+async function loadStatuses() {
+  const resp = await fetch(
+    `${config.url}/rest/v1/house_statuses?select=captain_name,house_key,status,subtype,notes,updated_at&order=updated_at.desc`,
+    {
+      headers: {
+        'apikey': config.key,
+        'Authorization': `Bearer ${config.key}`,
+      }
+    }
+  );
+  if (!resp.ok) throw new Error(`Supabase error: ${resp.status}`);
+  const rows = await resp.json();
+  const result = {};
+  rows.forEach(r => {
+    result[r.house_key] = {
+      status:    r.status,
+      subtype:   r.subtype,
+      notes:     r.notes,
+      captain:   r.captain_name,
+      updatedAt: r.updated_at,
+    };
+  });
+  return result;
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+async function init() {
+  try {
+    setSyncStatus('Loading geodata…', '');
+    houses = await loadGeodata();
+    if (mapReady) {
+      placeMarkers();
+      fitToHouses();
+      loadBuildingFootprints(); // houses now populated — safe to fetch/match buildings
+    }
+    setSyncStatus('Connecting to Supabase…', '');
+    await refresh();
+    refreshTimer = setInterval(refresh, 30000);
+  } catch (err) {
+    setSyncStatus(`Error: ${err.message}`, 'error');
+  }
+}
+
+async function refresh() {
+  try {
+    setSyncStatus('Refreshing…', '');
+    statuses = await loadStatuses();
+
+    if (mapReady) {
+      placeMarkers();
+      fitToHouses();
+      updateAllMarkers();
+    }
+    updateCounts();
+    renderList();
+
+    const now = new Date().toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
+    const reportedCount = Object.keys(statuses).length;
+    setSyncStatus(`Live · ${reportedCount} house${reportedCount !== 1 ? 'es' : ''} reported`, 'ok');
+    document.getElementById('last-updated').textContent = `Updated: ${now}`;
+  } catch (err) {
+    setSyncStatus(`Sync error: ${err.message}`, 'error');
+  }
+}
+
+function setSyncStatus(msg, cls) {
+  const el = document.getElementById('sync-row');
+  el.className = `sync-row${cls ? ' ' + cls : ''}`;
+  document.getElementById('sync-status').textContent = msg;
+}
+
+// ─── COUNTS ───────────────────────────────────────────────────────────────────
+function updateCounts() {
+  let g=0, r=0, u=0;
+  houses.forEach(h => {
+    const s = statuses[h.key]?.status || 'UNKNOWN';
+    if (s==='GREEN') g++;
+    else if (s==='RED') r++;
+    else u++;
+  });
+  document.getElementById('cnt-green').textContent = g;
+  document.getElementById('cnt-red').textContent   = r;
+  document.getElementById('cnt-unk').textContent   = u;
+  document.getElementById('cnt-total').textContent = houses.length;
+}
+
+// ─── SIDEBAR LIST ─────────────────────────────────────────────────────────────
+function setFilter(f, btn, colorClass) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => { b.className = 'filter-btn'; });
+  btn.className = `filter-btn active${colorClass ? ' ' + colorClass : ''}`;
+  renderList();
+}
+
+function renderList() {
+  const list = document.getElementById('house-list');
+  const toShow = houses.filter(h => {
+    if (currentFilter === 'all') return true;
+    return (statuses[h.key]?.status || 'UNKNOWN') === currentFilter;
+  });
+  toShow.sort((a, b) => {
+    const order = {RED:0, UNKNOWN:1, GREEN:2};
+    const sa = order[statuses[a.key]?.status || 'UNKNOWN'];
+    const sb = order[statuses[b.key]?.status || 'UNKNOWN'];
+    return sa - sb;
+  });
+
+  list.innerHTML = '';
+  toShow.forEach(h => {
+    const s = statuses[h.key];
+    const status = s?.status || 'UNKNOWN';
+    const dotClass = {GREEN:'green', RED:'red', UNKNOWN:'gray'}[status];
+    const statusLabel = {GREEN:'Okay', RED:'Needs Help', UNKNOWN:'Unknown'}[status];
+    const sym = s?.subtype ? ` ${SUBTYPE_SYMBOL[s.subtype]}` : '';
+    const captain = s?.captain ? ` · ${s.captain}` : '';
+
+    const div = document.createElement('div');
+    div.className = `house-item${selectedKey===h.key ? ' selected' : ''}`;
+    div.innerHTML = `
+      <div class="house-dot ${dotClass}"></div>
+      <div class="house-info">
+        <div class="house-addr">${h.houseNumber} ${h.street}</div>
+        <div class="house-detail">${statusLabel}${sym}${captain}</div>
+        ${s?.notes ? `<div class="house-notes">"${s.notes}"</div>` : ''}
+      </div>`;
+    div.onclick = () => selectHouse(h.key);
+    list.appendChild(div);
+  });
+}
+
+function selectHouse(key) {
+  selectedKey = key;
+  const h = houses.find(x => x.key === key);
+  const s = statuses[key];
+  if (h && map) map.flyTo({ center: [h.lng, h.lat], zoom: 19 });
+  renderList();
+
+  const panel = document.getElementById('detail-panel');
+  panel.classList.add('visible');
+  document.getElementById('detail-addr').textContent = `${h?.houseNumber} ${h?.street}`;
+
+  const statusLabel = {GREEN:'✅ Okay', RED:'🆘 Needs Help', UNKNOWN:'❓ Unknown'}[s?.status||'UNKNOWN'];
+  document.getElementById('detail-status').textContent = statusLabel;
+
+  const subtypeRow = document.getElementById('detail-subtype-row');
+  if (s?.subtype) {
+    subtypeRow.style.display = 'block';
+    document.getElementById('detail-subtype').textContent = `${SUBTYPE_SYMBOL[s.subtype]} ${s.subtype}`;
+  } else {
+    subtypeRow.style.display = 'none';
+  }
+
+  document.getElementById('detail-captain').textContent = s?.captain || '(not yet reported)';
+
+  const notesRow = document.getElementById('detail-notes-row');
+  if (s?.notes) {
+    notesRow.style.display = 'block';
+    document.getElementById('detail-notes').textContent = s.notes;
+  } else {
+    notesRow.style.display = 'none';
+  }
+
+  const updatedAt = s?.updatedAt
+    ? new Date(s.updatedAt).toLocaleString('en-US', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' })
+    : 'Not reported';
+  document.getElementById('detail-updated').textContent = updatedAt;
+}
+
+// ─── STARTUP ──────────────────────────────────────────────────────────────────
+(function startup() {
+  // If baked-in config is present (deployed via deploy_forms.py), skip config screen entirely.
+  const bakedReady = BAKED_SUPABASE_URL && !BAKED_SUPABASE_URL.includes('{{');
+  if (bakedReady) {
+    config = { url: BAKED_SUPABASE_URL, key: BAKED_SUPABASE_KEY, geodataUrl: BAKED_GEODATA_URL };
+    saveConfig(config);
+  } else {
+    config = loadConfig();
+  }
+
+  if (config.url && config.key) {
+    document.getElementById('config-screen').classList.add('hidden');
+    document.getElementById('main').classList.add('visible');
+    document.getElementById('cfg-url').value      = config.url;
+    document.getElementById('cfg-key').value      = config.key;
+    document.getElementById('cfg-geodata').value  = config.geodataUrl || '';
+    initMap();
+    init();
+  } else {
+    const saved = loadConfig();
+    if (saved.url) document.getElementById('cfg-url').value = saved.url;
+    if (saved.key) document.getElementById('cfg-key').value = saved.key;
+    if (saved.geodataUrl) document.getElementById('cfg-geodata').value = saved.geodataUrl;
+  }
+})();
+</script>
+</body>
+</html>
