@@ -616,7 +616,6 @@ function initHouseLayers() {
 }
 
 map.on('load', initHouseLayers);
-map.on('styledata', () => { if (map.isStyleLoaded()) initHouseLayers(); });
 
 // ─── BUILDING POLYGON UPGRADE (SVG overlay) ───────────────────────────────────
 // MapLibre v5 GeoJSON layers don't render reliably, so we draw building polygons
