@@ -332,7 +332,7 @@ html, body { height: 100%; overflow: hidden; font-family: system-ui, -apple-syst
   </div>
   <div class="report-body" id="report-body"></div>
   <div class="report-footer">
-    <button class="btn-sms"  onclick="sendSMS()">📱 Send SMS</button>
+    <button class="btn-sms"  onclick="sendText()">📱 Send Text</button>
     <button class="btn-copy" onclick="copyReport()">📋 Copy Text</button>
   </div>
 </div>
@@ -369,6 +369,11 @@ html, body { height: 100%; overflow: hidden; font-family: system-ui, -apple-syst
       <b>iPhone:</b> Tap Share (□↑) → "Add to Home Screen" — it will appear as an app icon on your home screen.<br>
       <b>Android:</b> Tap ⋮ menu → "Add to Home Screen" — same result.<br>
       <b>Map tiles</b> are saved in your browser's cache and stay available offline as long as you open the form from the same browser (or home screen icon). <em>Do not clear browser data before an emergency.</em>
+    </div>
+    <div style="margin-top:10px;padding:10px 12px;background:#fff3e0;border-radius:8px;font-size:0.78rem;line-height:1.5;color:#333;">
+      <b>⚠️ Important</b><br>
+      <b>Do NOT refresh the page</b> during an emergency — refreshing clears your map view and may lose unsaved data if you are offline.<br>
+      <b>Send Text on iPhone:</b> The "Send Text" button does <em>not</em> work from the home screen icon (Web App mode). To send texts, open the form in <b>Safari</b> instead. The home screen icon is fine for everything else.
     </div>
   </div>
 </div>
@@ -765,15 +770,15 @@ function applyBuildingFootprints(polygons) {
 }
 
 async function loadBuildingFootprints() {
-  if (!navigator.onLine) return;
-
+  // Always try localStorage cache first — works offline and avoids redundant fetches.
   let polygons = null;
   const cached = localStorage.getItem(BLDG_CACHE_KEY);
   if (cached) {
     try { polygons = JSON.parse(cached); } catch {}
   }
 
-  if (!polygons) {
+  // If no cache and we're online, fetch from Overpass API and store for offline use.
+  if (!polygons && navigator.onLine) {
     const pad = 0.004;
     const bbox = `${minLat - pad},${minLng - pad},${maxLat + pad},${maxLng + pad}`;
     const query = `[out:json][timeout:25];way["building"](${bbox});out geom;`;
@@ -1016,7 +1021,14 @@ function hideReport() {
   document.getElementById('report-overlay').classList.remove('visible');
 }
 
-async function sendSMS() {
+async function sendText() {
+  // SMS links don't work from iOS Web App mode (Add to Home Screen).
+  // Detect standalone mode and warn the user to open in Safari instead.
+  if (window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) {
+    alert('Text messaging is not available in Web App mode.\n\nOpen this form in Safari (or your browser) instead of the home screen icon to send texts.');
+    return;
+  }
+
   const body = buildReportText();
   const phones = [DIRECTOR_PHONE, BACKUP_PHONE, COORDINATOR_PHONE, CAPTAIN_PHONE]
     .filter(p => p && p.replace(/\D/g,'').length >= 7);
@@ -1027,8 +1039,8 @@ async function sendSMS() {
   // clipboard is the reliable workaround.
   try {
     await navigator.clipboard.writeText(recipientStr);
-    showToast('Phone numbers copied — paste into To: field', 'ok');
-    await new Promise(r => setTimeout(r, 900)); // let toast show before app switches
+    showToast(`${phones.length} phone numbers copied — paste into To: field`, 'ok');
+    await new Promise(r => setTimeout(r, 2500)); // longer pause so user can read the message
   } catch {
     // clipboard unavailable — proceed anyway
   }
