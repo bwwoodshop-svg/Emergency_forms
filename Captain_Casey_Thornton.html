@@ -1034,22 +1034,18 @@ async function sendText() {
     .filter(p => p && p.replace(/\D/g,'').length >= 7);
   const recipientStr = phones.join(', ');
 
-  // Copy phone numbers to clipboard so user can paste into the SMS To: field.
-  // On iOS, navigator.share opens the share sheet but can't pre-fill recipients —
-  // clipboard is the reliable workaround.
+  // Use sms: URL to open the native text messaging app directly.
+  // iOS uses &body=, Android uses ?body= — iOS accepts both, so ?body= works everywhere.
+  // Skip navigator.share — it opens the share sheet instead of going straight to Messages.
   try {
     await navigator.clipboard.writeText(recipientStr);
-    showToast(`${phones.length} phone numbers copied — paste into To: field`, 'ok');
-    await new Promise(r => setTimeout(r, 2500)); // longer pause so user can read the message
+    showToast(`${phones.length} phone numbers copied — paste into To: field if needed`, 'ok');
+    await new Promise(r => setTimeout(r, 2500)); // let user read the toast before app switch
   } catch {
     // clipboard unavailable — proceed anyway
   }
 
-  if (navigator.share) {
-    navigator.share({ text: body }).catch(() => {});
-  } else {
-    window.location.href = `sms:${phones.join(',')}?body=${encodeURIComponent(body)}`;
-  }
+  window.location.href = `sms:${phones.join(',')}?body=${encodeURIComponent(body)}`;
 }
 
 function copyReport() {
