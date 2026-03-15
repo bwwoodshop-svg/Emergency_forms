@@ -1178,9 +1178,9 @@ function latLngToTile(lat, lng, z) {
 }
 
 // ─── ONLINE / OFFLINE DETECTION ───────────────────────────────────────────────
-function handleConnectivity() {
+function setOnlineUI(isOnline) {
   const sendBtn = document.getElementById('btn-send-text');
-  if (navigator.onLine) {
+  if (isOnline) {
     document.getElementById('offline-banner').classList.remove('visible');
     updateSyncIndicator('online');
     syncAllPending();
@@ -1192,9 +1192,21 @@ function handleConnectivity() {
   }
 }
 
-window.addEventListener('online',  handleConnectivity);
-window.addEventListener('offline', handleConnectivity);
-handleConnectivity();
+// navigator.onLine only checks for a network interface, not real internet.
+// Do a lightweight fetch to confirm actual connectivity.
+async function checkRealConnectivity() {
+  if (!navigator.onLine) { setOnlineUI(false); return; }
+  try {
+    await fetch('https://tiles.openfreemap.org/styles/liberty', { method: 'HEAD', mode: 'no-cors', cache: 'no-store' });
+    setOnlineUI(true);
+  } catch {
+    setOnlineUI(false);
+  }
+}
+
+window.addEventListener('online',  checkRealConnectivity);
+window.addEventListener('offline', () => setOnlineUI(false));
+checkRealConnectivity();
 </script>
 </body>
 </html>
