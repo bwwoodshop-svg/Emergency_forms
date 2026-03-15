@@ -301,7 +301,7 @@ html, body { height: 100%; overflow: hidden; font-family: system-ui, -apple-syst
 </div>
 
 <!-- OFFLINE BANNER -->
-<div id="offline-banner">📵 Offline — map may be limited</div>
+<div id="offline-banner">📵 Offline — do not refresh this page</div>
 
 <!-- BOTTOM SHEET BACKDROP -->
 <div id="sheet-backdrop" onclick="closeSheet()"></div>
@@ -351,7 +351,7 @@ html, body { height: 100%; overflow: hidden; font-family: system-ui, -apple-syst
   </div>
   <div class="report-body" id="report-body"></div>
   <div class="report-footer">
-    <button class="btn-sms"  onclick="sendText()">📱 Send Text</button>
+    <button class="btn-sms" id="btn-send-text" onclick="sendText()">📱 Send Text</button>
     <button class="btn-copy" onclick="copyReport()">📋 Copy Text</button>
   </div>
 </div>
@@ -373,26 +373,20 @@ html, body { height: 100%; overflow: hidden; font-family: system-ui, -apple-syst
 <div id="offline-modal">
   <div class="modal-box">
     <h3>⬇ Save Map for Offline Use</h3>
-    <p>Downloads all map tiles for this area. Do this <b>once while connected</b> — the map will then work without internet.</p>
+    <p>Do this <b>once</b> while connected.</p>
     <div class="modal-progress-wrap">
       <div class="modal-progress" id="offline-progress"></div>
     </div>
     <div class="modal-progress-label" id="offline-progress-label">Ready</div>
     <div class="modal-buttons">
-      <button class="modal-btn-start" id="offline-btn-start" onclick="downloadTiles()">Download Tiles</button>
+      <button class="modal-btn-start" id="offline-btn-start" onclick="downloadTiles()">Download</button>
       <button class="modal-btn-cancel" onclick="hideOfflineModal()">Close</button>
     </div>
-    <!-- How to find this form again after saving offline -->
-    <div style="margin-top:14px;padding:10px 12px;background:#f0f4ff;border-radius:8px;font-size:0.78rem;line-height:1.5;color:#333;">
-      <b>📌 How to find this form again</b><br>
-      <b>iPhone:</b> Tap Share (□↑) → "Add to Home Screen" — it will appear as an app icon on your home screen.<br>
-      <b>Android:</b> Tap ⋮ menu → "Add to Home Screen" — same result.<br>
-      <b>Map tiles</b> are saved in your browser's cache and stay available offline as long as you open the form from the same browser (or home screen icon). <em>Do not clear browser data before an emergency.</em>
-    </div>
-    <div style="margin-top:10px;padding:10px 12px;background:#fff3e0;border-radius:8px;font-size:0.78rem;line-height:1.5;color:#333;">
-      <b>⚠️ Important</b><br>
-      <b>Do NOT refresh the page</b> during an emergency — refreshing clears your map view and may lose unsaved data if you are offline.<br>
-      <b>Send Text on iPhone:</b> The "Send Text" button does <em>not</em> work from the home screen icon (Web App mode). To send texts, open the form in <b>Safari</b> instead. The home screen icon is fine for everything else.
+    <!-- Instructions shown after download completes -->
+    <div id="offline-instructions" style="display:none;margin-top:14px;padding:10px 12px;background:#f0f4ff;border-radius:8px;font-size:0.78rem;line-height:1.5;color:#333;">
+      Close this popup and while on the form:<br>
+      <b>iPhone:</b> Share (□↑) → Add to Home Screen <span style="font-size:0.7rem;color:#666;">(toggle off "Open as Web App")</span> OR Bookmark<br>
+      <b>Android:</b> ⋮ menu → Add to Home Screen OR Bookmark
     </div>
   </div>
 </div>
@@ -1158,6 +1152,7 @@ async function downloadTiles() {
   document.getElementById('offline-progress-label').textContent = `✓ Done! ${total} tiles saved.`;
   btn.textContent = 'Download Again';
   btn.disabled = false;
+  document.getElementById('offline-instructions').style.display = 'block';
 }
 
 function latLngToTile(lat, lng, z) {
@@ -1170,13 +1165,16 @@ function latLngToTile(lat, lng, z) {
 
 // ─── ONLINE / OFFLINE DETECTION ───────────────────────────────────────────────
 function handleConnectivity() {
+  const sendBtn = document.getElementById('btn-send-text');
   if (navigator.onLine) {
     document.getElementById('offline-banner').classList.remove('visible');
     updateSyncIndicator('online');
     syncAllPending();
+    if (sendBtn) { sendBtn.disabled = false; sendBtn.style.opacity = '1'; }
   } else {
     document.getElementById('offline-banner').classList.add('visible');
     updateSyncIndicator('offline');
+    if (sendBtn) { sendBtn.disabled = true; sendBtn.style.opacity = '0.4'; }
   }
 }
 
