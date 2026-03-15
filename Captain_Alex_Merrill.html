@@ -60,10 +60,13 @@ html, body { height: 100%; overflow: hidden; font-family: system-ui, -apple-syst
 .sync-indicator.syncing { color: #FFB74D; }
 
 /* ── FAB (floating action buttons) ─────────────────────────────────────────── */
-#fab-group {
+#fab-left {
+  position: fixed; bottom: 24px; left: 14px;
+  z-index: 20;
+}
+#fab-right {
   position: fixed; bottom: 24px; right: 14px;
   z-index: 20;
-  display: flex; flex-direction: column; gap: 10px; align-items: flex-end;
 }
 .fab {
   display: flex; align-items: center; gap: 8px;
@@ -82,7 +85,7 @@ html, body { height: 100%; overflow: hidden; font-family: system-ui, -apple-syst
 
 /* ── OFFLINE BANNER ─────────────────────────────────────────────────────────── */
 #offline-banner {
-  position: fixed; bottom: 24px; left: 14px;
+  position: fixed; bottom: 72px; left: 14px;
   z-index: 20;
   background: #b71c1c; color: white;
   padding: 8px 12px; border-radius: 8px;
@@ -280,10 +283,12 @@ html, body { height: 100%; overflow: hidden; font-family: system-ui, -apple-syst
 </div>
 
 <!-- FAB BUTTONS -->
-<div id="fab-group">
+<div id="fab-left">
   <button class="fab blue" onclick="showReport()">
     <span class="fab-icon">📋</span> View Report
   </button>
+</div>
+<div id="fab-right">
   <button class="fab teal" onclick="showOfflineModal()">
     <span class="fab-icon">⬇</span> Save Offline
   </button>
@@ -510,7 +515,13 @@ let _newEmergencyResolve = null;
 
 function confirmNewEmergency(isNew) {
   document.getElementById('new-emergency-modal').style.display = 'none';
-  if (isNew) { statuses = {}; saveState(statuses); }
+  if (isNew) {
+    statuses = {};
+    saveState(statuses);
+    // Redraw buildings and counts so map visually resets to all-unchecked
+    if (typeof redrawBuildingSVG === 'function') redrawBuildingSVG();
+    if (typeof updateCounts === 'function') updateCounts();
+  }
   if (_newEmergencyResolve) _newEmergencyResolve();
 }
 
