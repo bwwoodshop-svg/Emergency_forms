@@ -790,8 +790,8 @@ function applyBuildingFootprints(polygons) {
   maybeHideLoadingOverlay();
 }
 
-// Wait for BOTH map tiles and buildings before showing the map.
-// Buildings can load from cache instantly but tiles need network rendering.
+// Loading overlay logic: wait for BOTH map tiles (idle) and buildings before reveal.
+// Start building fetch on 'load' (early), but only dismiss after 'idle' (tiles painted).
 let _buildingsReady = false;
 let _mapIdle = false;
 
@@ -799,12 +799,15 @@ function maybeHideLoadingOverlay() {
   if (!_buildingsReady || !_mapIdle) return;
   const overlay = document.getElementById('loading-overlay');
   if (!overlay) return;
-  // Resize so MapLibre repaints, then redraw buildings with correct projections
   map.resize();
+  // Redraw with correct projections now that map is fully rendered
   redrawBuildingSVG();
-  overlay.style.transition = 'opacity 0.4s';
-  overlay.style.opacity = '0';
-  setTimeout(() => overlay.remove(), 400);
+  // Short delay lets the browser paint the final frame before we fade
+  setTimeout(() => {
+    overlay.style.transition = 'opacity 0.4s';
+    overlay.style.opacity = '0';
+    setTimeout(() => overlay.remove(), 400);
+  }, 200);
 }
 
 async function loadBuildingFootprints() {
@@ -848,15 +851,17 @@ async function loadBuildingFootprints() {
   }
 }
 
-// Load buildings after map is idle (tiles rendered, projections accurate).
-// Using 'idle' instead of 'load' prevents SVG drawing with bad coordinates on iOS.
+// Start building fetch on 'load' (style ready) so data is ready when idle fires.
+map.on('load', loadBuildingFootprints);
+
+// Mark map idle when tiles are fully rendered — this is when projections are accurate.
 map.once('idle', () => {
   _mapIdle = true;
-  loadBuildingFootprints();
+  // If buildings loaded from cache before idle, they drew with bad projections.
+  // Redraw now that projections are correct, then dismiss overlay.
+  if (_buildingsReady) redrawBuildingSVG();
+  maybeHideLoadingOverlay();
 });
-
-// Fallback: if anything takes too long (slow network), force show after 10 seconds
-setTimeout(() => { _buildingsReady = true; _mapIdle = true; maybeHideLoadingOverlay(); }, 10000);
 
 updateCounts();
 
