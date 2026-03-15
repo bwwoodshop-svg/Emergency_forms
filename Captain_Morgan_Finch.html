@@ -50,7 +50,7 @@ html, body { height: 100%; overflow: hidden; font-family: system-ui, -apple-syst
 .stat-pill.green { background: rgba(76,175,80,0.3); color: #81c784; }
 .stat-pill.red   { background: rgba(244,67,54,0.3);  color: #e57373; }
 .stat-pill.gray  { background: rgba(255,193,7,0.25); color: #ffd54f; }
-.stat-pill.unchecked { background: rgba(158,158,158,0.25); color: #bdbdbd; border: 1.5px solid #FFC107; }
+.stat-pill.unchecked { background: rgba(158,158,158,0.25); color: #bdbdbd; border: 1.5px solid #333; }
 .dot-sm { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
 .dot-green { background: #4CAF50; }
 .dot-red   { background: #f44336; }
@@ -607,7 +607,7 @@ function markerLabel(key) {
 }
 
 function markerBorder(key) {
-  // Unchecked houses get a yellow outline so captains can spot them among other gray buildings
+  // Unchecked houses get a black outline so captains can spot them among other gray buildings
   return statuses[key]?.status ? '2px solid rgba(0,0,0,0.3)' : '2.5px solid #FFC107';
 }
 
@@ -699,8 +699,8 @@ function redrawBuildingSVG() {
     const unchecked = !statuses[key]?.status;
     poly.setAttribute('fill', color);
     poly.setAttribute('fill-opacity', '0.82');
-    // Unchecked buildings get a yellow outline so captains can spot their assigned houses
-    poly.setAttribute('stroke', unchecked ? '#FFC107' : 'rgba(0,0,0,0.45)');
+    // Unchecked buildings get a black outline so captains can spot their assigned houses
+    poly.setAttribute('stroke', unchecked ? '#222' : 'rgba(0,0,0,0.45)');
     poly.setAttribute('stroke-width', unchecked ? '2.5' : '1.5');
     poly.style.pointerEvents = 'all';
     poly.style.cursor = 'pointer';
