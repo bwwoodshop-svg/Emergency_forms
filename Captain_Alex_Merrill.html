@@ -254,6 +254,13 @@ html, body { height: 100%; overflow: hidden; font-family: system-ui, -apple-syst
 </head>
 <body>
 
+<!-- LOADING OVERLAY — hides map until buildings are rendered -->
+<div id="loading-overlay" style="position:fixed;inset:0;z-index:9999;background:#1a1a2e;display:flex;align-items:center;justify-content:center;flex-direction:column;color:white;font-family:system-ui,sans-serif;">
+  <div style="font-size:1.8rem;margin-bottom:12px;">🚨</div>
+  <div style="font-size:1.1rem;font-weight:700;">Emergency Com</div>
+  <div style="font-size:0.82rem;color:#aaa;margin-top:6px;">Loading map...</div>
+</div>
+
 <!-- MAP -->
 <div id="map"></div>
 
@@ -719,6 +726,15 @@ function applyBuildingFootprints(polygons) {
     }
   });
   if (matched) redrawBuildingSVG();
+  hideLoadingOverlay();
+}
+
+function hideLoadingOverlay() {
+  const overlay = document.getElementById('loading-overlay');
+  if (!overlay) return;
+  overlay.style.transition = 'opacity 0.4s';
+  overlay.style.opacity = '0';
+  setTimeout(() => overlay.remove(), 400);
 }
 
 async function loadBuildingFootprints() {
@@ -753,10 +769,18 @@ async function loadBuildingFootprints() {
     } catch { return; }
   }
 
-  if (polygons && polygons.length) applyBuildingFootprints(polygons);
+  if (polygons && polygons.length) {
+    applyBuildingFootprints(polygons);
+  } else {
+    // No buildings available (first load offline, no cache) — show map anyway
+    hideLoadingOverlay();
+  }
 }
 
 map.on('load', loadBuildingFootprints);
+
+// Fallback: if buildings take too long (slow network), show map after 8 seconds
+setTimeout(hideLoadingOverlay, 8000);
 
 updateCounts();
 
@@ -973,31 +997,17 @@ function hideReport() {
   document.getElementById('report-overlay').classList.remove('visible');
 }
 
-async function sendText() {
+function sendText() {
   // SMS links don't work from iOS Web App mode (Add to Home Screen).
-  // Detect standalone mode and warn the user to open in Safari instead.
   if (window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) {
     alert('Text messaging is not available in Web App mode.\n\nOpen this form in Safari (or your browser) instead of the home screen icon to send texts.');
     return;
   }
 
   const body = buildReportText();
-  const phones = [DIRECTOR_PHONE, BACKUP_PHONE, COORDINATOR_PHONE, CAPTAIN_PHONE]
-    .filter(p => p && p.replace(/\D/g,'').length >= 7);
-  const recipientStr = phones.join(', ');
-
-  // Use sms: URL to open the native text messaging app directly.
-  // iOS uses &body=, Android uses ?body= — iOS accepts both, so ?body= works everywhere.
-  // Skip navigator.share — it opens the share sheet instead of going straight to Messages.
-  try {
-    await navigator.clipboard.writeText(recipientStr);
-    showToast(`${phones.length} phone numbers copied — paste into To: field if needed`, 'ok');
-    await new Promise(r => setTimeout(r, 2500)); // let user read the toast before app switch
-  } catch {
-    // clipboard unavailable — proceed anyway
-  }
-
-  window.location.href = `sms:${phones.join(',')}?body=${encodeURIComponent(body)}`;
+  // Send directly to director — sms: URL opens Messages with To: pre-filled.
+  const phone = DIRECTOR_PHONE.replace(/\D/g, '');
+  window.location.href = `sms:${phone}?body=${encodeURIComponent(body)}`;
 }
 
 function copyReport() {
