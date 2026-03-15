@@ -14,17 +14,17 @@
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 html, body { height: 100%; overflow: hidden; font-family: system-ui, -apple-system, sans-serif; }
 
-/* ── Hide MapLibre logo, keep attribution as compact (i) button ──────────── */
+/* ── Hide MapLibre logo ──────────────────────────────────────────────────── */
 .maplibregl-ctrl-logo { display: none !important; }
-.maplibregl-ctrl-attrib { font-size: 0 !important; }
-.maplibregl-ctrl-attrib.maplibregl-compact { font-size: 0 !important; }
-.maplibregl-ctrl-attrib-button { display: block !important; }
 
 /* ── MAP ────────────────────────────────────────────────────────────────────── */
 #map {
   position: fixed; top: 0; left: 0; right: 0; bottom: 0;
   z-index: 1;
+  opacity: 0; /* hidden until buildings load — see maybeRevealMap() */
+  transition: opacity 0.5s ease;
 }
+#map.ready { opacity: 1; }
 
 /* ── HEADER ─────────────────────────────────────────────────────────────────── */
 #header {
@@ -263,15 +263,15 @@ html, body { height: 100%; overflow: hidden; font-family: system-ui, -apple-syst
 </head>
 <body>
 
-<!-- LOADING OVERLAY — hides map until buildings are rendered -->
-<div id="loading-overlay" style="position:fixed;inset:0;z-index:9999;background:rgba(26,26,46,0.97);display:flex;align-items:center;justify-content:center;flex-direction:column;color:white;font-family:system-ui,sans-serif;">
+<!-- MAP (starts invisible, revealed by maybeRevealMap when buildings load) -->
+<div id="map"></div>
+
+<!-- LOADING MESSAGE — shown on top of hidden map, removed when ready -->
+<div id="loading-msg" style="position:fixed;inset:0;z-index:9999;background:#1a1a2e;display:flex;align-items:center;justify-content:center;flex-direction:column;color:white;font-family:system-ui,sans-serif;pointer-events:none;">
   <div style="font-size:1.8rem;margin-bottom:12px;">🚨</div>
   <div style="font-size:1.1rem;font-weight:700;">Emergency Com</div>
   <div style="font-size:0.82rem;color:#aaa;margin-top:6px;">Loading map...</div>
 </div>
-
-<!-- MAP -->
-<div id="map"></div>
 
 <!-- HEADER -->
 <div id="header">
@@ -765,26 +765,25 @@ function applyBuildingFootprints(polygons) {
   });
   if (matched) redrawBuildingSVG();
   _buildingsReady = true;
-  maybeHideLoadingOverlay();
+  maybeRevealMap();
 }
 
-// Loading overlay: dismiss after buildings are loaded.
-// The overlay is semi-transparent so MapLibre can render tiles behind it
-// (solid overlays can block iOS WebGL from painting, preventing 'idle' from firing).
+// Map starts at opacity:0. When buildings are loaded, add .ready class to fade in
+// and remove the loading message. CSS opacity on #map doesn't block WebGL rendering
+// the way an overlay div does on iOS Safari.
 let _buildingsReady = false;
 
-function maybeHideLoadingOverlay() {
+function maybeRevealMap() {
   if (!_buildingsReady) return;
-  const overlay = document.getElementById('loading-overlay');
-  if (!overlay) return;
   map.resize();
   redrawBuildingSVG();
-  // Let browser paint one frame, then fade out
-  requestAnimationFrame(() => {
-    overlay.style.transition = 'opacity 0.5s';
-    overlay.style.opacity = '0';
-    setTimeout(() => overlay.remove(), 500);
-  });
+  document.getElementById('map').classList.add('ready');
+  const msg = document.getElementById('loading-msg');
+  if (msg) {
+    msg.style.transition = 'opacity 0.5s';
+    msg.style.opacity = '0';
+    setTimeout(() => msg.remove(), 500);
+  }
 }
 
 async function loadBuildingFootprints() {
@@ -825,7 +824,7 @@ async function loadBuildingFootprints() {
   } else {
     // No buildings available (first load offline, no cache) — show map anyway
     _buildingsReady = true;
-    maybeHideLoadingOverlay();
+    maybeRevealMap();
   }
 }
 
