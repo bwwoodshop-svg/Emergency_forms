@@ -91,11 +91,11 @@ html, body { height: 100%; overflow: hidden; font-family: system-ui, -apple-syst
 
 /* ── OFFLINE BANNER ─────────────────────────────────────────────────────────── */
 #offline-banner {
-  position: fixed; top: 0; left: 0; right: 0;
-  z-index: 30;
+  position: fixed; top: 68px; left: 0; right: 0;
+  z-index: 19;
   background: #b71c1c; color: white;
-  padding: 10px 14px; border-radius: 0;
-  font-size: 0.85rem; font-weight: 600;
+  padding: 8px 14px; border-radius: 0;
+  font-size: 0.82rem; font-weight: 600;
   text-align: center;
   box-shadow: 0 2px 8px rgba(0,0,0,0.3);
   display: none;
@@ -1200,25 +1200,31 @@ function setOnlineUI(isOnline) {
   }
 }
 
-// navigator.onLine only checks for a network interface, not real internet.
-// Do a real fetch with a cache-busting param to confirm actual connectivity.
+// Start as online by default. Only switch to offline when we're certain:
+// either navigator.onLine is false, or a real fetch fails.
+// The Supabase sync already detects offline on save — this catches it on load too.
 async function checkRealConnectivity() {
   if (!navigator.onLine) { setOnlineUI(false); return; }
   try {
     const ctrl = new AbortController();
-    setTimeout(() => ctrl.abort(), 4000); // 4s timeout
-    const resp = await fetch('https://tiles.openfreemap.org/styles/liberty?_t=' + Date.now(), {
-      method: 'GET', cache: 'no-store', signal: ctrl.signal
+    setTimeout(() => ctrl.abort(), 5000);
+    // Use HEAD to Supabase (CORS-friendly) with cache bust
+    await fetch(SUPABASE_URL + '/rest/v1/?_t=' + Date.now(), {
+      method: 'HEAD', signal: ctrl.signal,
+      headers: { 'apikey': SUPABASE_KEY }
     });
-    setOnlineUI(resp.ok);
+    setOnlineUI(true);
   } catch {
     setOnlineUI(false);
   }
 }
 
-window.addEventListener('online',  checkRealConnectivity);
+window.addEventListener('online',  () => { setOnlineUI(true); checkRealConnectivity(); });
 window.addEventListener('offline', () => setOnlineUI(false));
-checkRealConnectivity();
+
+// Default to online, then verify in background after map loads
+setOnlineUI(true);
+setTimeout(checkRealConnectivity, 2000);
 </script>
 </body>
 </html>
