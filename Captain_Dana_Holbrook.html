@@ -778,8 +778,9 @@ function maybeHideLoadingOverlay() {
   if (!_buildingsReady || !_mapIdle) return;
   const overlay = document.getElementById('loading-overlay');
   if (!overlay) return;
-  // Trigger a resize so MapLibre repaints fully, then fade out
+  // Resize so MapLibre repaints, then redraw buildings with correct projections
   map.resize();
+  redrawBuildingSVG();
   overlay.style.transition = 'opacity 0.4s';
   overlay.style.opacity = '0';
   setTimeout(() => overlay.remove(), 400);
@@ -826,10 +827,12 @@ async function loadBuildingFootprints() {
   }
 }
 
-map.on('load', loadBuildingFootprints);
-
-// Mark map as ready once tiles are fully rendered
-map.once('idle', () => { _mapIdle = true; maybeHideLoadingOverlay(); });
+// Load buildings after map is idle (tiles rendered, projections accurate).
+// Using 'idle' instead of 'load' prevents SVG drawing with bad coordinates on iOS.
+map.once('idle', () => {
+  _mapIdle = true;
+  loadBuildingFootprints();
+});
 
 // Fallback: if anything takes too long (slow network), force show after 10 seconds
 setTimeout(() => { _buildingsReady = true; _mapIdle = true; maybeHideLoadingOverlay(); }, 10000);
