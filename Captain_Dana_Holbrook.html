@@ -585,7 +585,11 @@ const map = new maplibregl.Map({
   zoom: 17,
   minZoom: 14,
   maxBounds: [[minLng - 0.05, minLat - 0.03], [maxLng + 0.05, maxLat + 0.03]],
+  logoPosition: 'bottom-right',
+  attributionControl: false,
 });
+// Compact attribution — shows as small (i) button instead of full banner
+map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-right');
 
 // ─── HOUSE MARKERS ────────────────────────────────────────────────────────────
 const houseMarkers = {}; // key → { marker, el }
