@@ -91,12 +91,11 @@ html, body { height: 100%; overflow: hidden; font-family: system-ui, -apple-syst
 
 /* ── OFFLINE BANNER ─────────────────────────────────────────────────────────── */
 #offline-banner {
-  position: fixed; top: 68px; left: 0; right: 0;
+  position: fixed; top: 68px; right: 14px;
   z-index: 19;
   background: #b71c1c; color: white;
-  padding: 8px 14px; border-radius: 0;
-  font-size: 0.82rem; font-weight: 600;
-  text-align: center;
+  padding: 6px 12px; border-radius: 8px;
+  font-size: 0.78rem; font-weight: 600;
   box-shadow: 0 2px 8px rgba(0,0,0,0.3);
   display: none;
   max-width: 200px;
@@ -849,6 +848,14 @@ async function loadBuildingFootprints() {
 // Start building fetch when style is loaded — data will be ready by the time we dismiss.
 map.on('load', loadBuildingFootprints);
 
+// Fallback: if map style never loads (slow CDN), reveal after 12 seconds anyway
+setTimeout(() => {
+  if (!_buildingsReady) {
+    _buildingsReady = true;
+    maybeRevealMap();
+  }
+}, 12000);
+
 updateCounts();
 
 // ─── BOTTOM SHEET ─────────────────────────────────────────────────────────────
@@ -1193,31 +1200,15 @@ function setOnlineUI(isOnline) {
   }
 }
 
-// Start as online by default. Only switch to offline when we're certain:
-// either navigator.onLine is false, or a real fetch fails.
-// The Supabase sync already detects offline on save — this catches it on load too.
-async function checkRealConnectivity() {
-  if (!navigator.onLine) { setOnlineUI(false); return; }
-  try {
-    const ctrl = new AbortController();
-    setTimeout(() => ctrl.abort(), 5000);
-    // Use HEAD to Supabase (CORS-friendly) with cache bust
-    await fetch(SUPABASE_URL + '/rest/v1/?_t=' + Date.now(), {
-      method: 'HEAD', signal: ctrl.signal,
-      headers: { 'apikey': SUPABASE_KEY }
-    });
-    setOnlineUI(true);
-  } catch {
-    setOnlineUI(false);
-  }
+// Use navigator.onLine for connectivity state. The sync function already handles
+// real network failures gracefully — this just controls the UI indicator and banner.
+function checkConnectivity() {
+  setOnlineUI(navigator.onLine);
 }
 
-window.addEventListener('online',  () => { setOnlineUI(true); checkRealConnectivity(); });
-window.addEventListener('offline', () => setOnlineUI(false));
-
-// Default to online, then verify in background after map loads
-setOnlineUI(true);
-setTimeout(checkRealConnectivity, 2000);
+window.addEventListener('online',  checkConnectivity);
+window.addEventListener('offline', checkConnectivity);
+checkConnectivity();
 </script>
 </body>
 </html>
