@@ -91,11 +91,12 @@ html, body { height: 100%; overflow: hidden; font-family: system-ui, -apple-syst
 
 /* ── OFFLINE BANNER ─────────────────────────────────────────────────────────── */
 #offline-banner {
-  position: fixed; bottom: 72px; left: 14px;
-  z-index: 20;
+  position: fixed; top: 0; left: 0; right: 0;
+  z-index: 30;
   background: #b71c1c; color: white;
-  padding: 8px 12px; border-radius: 8px;
-  font-size: 0.78rem; font-weight: 500;
+  padding: 10px 14px; border-radius: 0;
+  font-size: 0.85rem; font-weight: 600;
+  text-align: center;
   box-shadow: 0 2px 8px rgba(0,0,0,0.3);
   display: none;
   max-width: 200px;
@@ -1186,12 +1187,16 @@ function setOnlineUI(isOnline) {
 }
 
 // navigator.onLine only checks for a network interface, not real internet.
-// Do a lightweight fetch to confirm actual connectivity.
+// Do a real fetch with a cache-busting param to confirm actual connectivity.
 async function checkRealConnectivity() {
   if (!navigator.onLine) { setOnlineUI(false); return; }
   try {
-    await fetch('https://tiles.openfreemap.org/styles/liberty', { method: 'HEAD', mode: 'no-cors', cache: 'no-store' });
-    setOnlineUI(true);
+    const ctrl = new AbortController();
+    setTimeout(() => ctrl.abort(), 4000); // 4s timeout
+    const resp = await fetch('https://tiles.openfreemap.org/styles/liberty?_t=' + Date.now(), {
+      method: 'GET', cache: 'no-store', signal: ctrl.signal
+    });
+    setOnlineUI(resp.ok);
   } catch {
     setOnlineUI(false);
   }
