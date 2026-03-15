@@ -258,7 +258,7 @@ html, body { height: 100%; overflow: hidden; font-family: system-ui, -apple-syst
 <body>
 
 <!-- LOADING OVERLAY — hides map until buildings are rendered -->
-<div id="loading-overlay" style="position:fixed;inset:0;z-index:9999;background:#1a1a2e;display:flex;align-items:center;justify-content:center;flex-direction:column;color:white;font-family:system-ui,sans-serif;">
+<div id="loading-overlay" style="position:fixed;inset:0;z-index:9999;background:rgba(26,26,46,0.97);display:flex;align-items:center;justify-content:center;flex-direction:column;color:white;font-family:system-ui,sans-serif;">
   <div style="font-size:1.8rem;margin-bottom:12px;">🚨</div>
   <div style="font-size:1.1rem;font-weight:700;">Emergency Com</div>
   <div style="font-size:0.82rem;color:#aaa;margin-top:6px;">Loading map...</div>
@@ -790,24 +790,23 @@ function applyBuildingFootprints(polygons) {
   maybeHideLoadingOverlay();
 }
 
-// Loading overlay logic: wait for BOTH map tiles (idle) and buildings before reveal.
-// Start building fetch on 'load' (early), but only dismiss after 'idle' (tiles painted).
+// Loading overlay: dismiss after buildings are loaded.
+// The overlay is semi-transparent so MapLibre can render tiles behind it
+// (solid overlays can block iOS WebGL from painting, preventing 'idle' from firing).
 let _buildingsReady = false;
-let _mapIdle = false;
 
 function maybeHideLoadingOverlay() {
-  if (!_buildingsReady || !_mapIdle) return;
+  if (!_buildingsReady) return;
   const overlay = document.getElementById('loading-overlay');
   if (!overlay) return;
   map.resize();
-  // Redraw with correct projections now that map is fully rendered
   redrawBuildingSVG();
-  // Short delay lets the browser paint the final frame before we fade
-  setTimeout(() => {
-    overlay.style.transition = 'opacity 0.4s';
+  // Let browser paint one frame, then fade out
+  requestAnimationFrame(() => {
+    overlay.style.transition = 'opacity 0.5s';
     overlay.style.opacity = '0';
-    setTimeout(() => overlay.remove(), 400);
-  }, 200);
+    setTimeout(() => overlay.remove(), 500);
+  });
 }
 
 async function loadBuildingFootprints() {
@@ -825,21 +824,22 @@ async function loadBuildingFootprints() {
     const query = `[out:json][timeout:25];way["building"](${bbox});out geom;`;
     try {
       const resp = await fetch('https://overpass-api.de/api/interpreter', { method: 'POST', body: query });
-      if (!resp.ok) return;
-      const data = await resp.json();
-      polygons = data.elements
-        .filter(el => el.type === 'way' && el.geometry && el.geometry.length >= 3)
-        .map(el => {
-          const coords = el.geometry.map(pt => [pt.lon, pt.lat]);
-          if (coords[0][0] !== coords[coords.length-1][0] || coords[0][1] !== coords[coords.length-1][1]) {
-            coords.push(coords[0]);
-          }
-          const lng = coords.reduce((s, c) => s + c[0], 0) / coords.length;
-          const lat = coords.reduce((s, c) => s + c[1], 0) / coords.length;
-          return { lng, lat, centLng: lng, centLat: lat, coords };
-        });
-      localStorage.setItem(BLDG_CACHE_KEY, JSON.stringify(polygons));
-    } catch { return; }
+      if (resp.ok) {
+        const data = await resp.json();
+        polygons = data.elements
+          .filter(el => el.type === 'way' && el.geometry && el.geometry.length >= 3)
+          .map(el => {
+            const coords = el.geometry.map(pt => [pt.lon, pt.lat]);
+            if (coords[0][0] !== coords[coords.length-1][0] || coords[0][1] !== coords[coords.length-1][1]) {
+              coords.push(coords[0]);
+            }
+            const lng = coords.reduce((s, c) => s + c[0], 0) / coords.length;
+            const lat = coords.reduce((s, c) => s + c[1], 0) / coords.length;
+            return { lng, lat, centLng: lng, centLat: lat, coords };
+          });
+        localStorage.setItem(BLDG_CACHE_KEY, JSON.stringify(polygons));
+      }
+    } catch { /* Overpass unavailable — proceed without buildings */ }
   }
 
   if (polygons && polygons.length) {
@@ -851,17 +851,8 @@ async function loadBuildingFootprints() {
   }
 }
 
-// Start building fetch on 'load' (style ready) so data is ready when idle fires.
+// Start building fetch when style is loaded — data will be ready by the time we dismiss.
 map.on('load', loadBuildingFootprints);
-
-// Mark map idle when tiles are fully rendered — this is when projections are accurate.
-map.once('idle', () => {
-  _mapIdle = true;
-  // If buildings loaded from cache before idle, they drew with bad projections.
-  // Redraw now that projections are correct, then dismiss overlay.
-  if (_buildingsReady) redrawBuildingSVG();
-  maybeHideLoadingOverlay();
-});
 
 updateCounts();
 
