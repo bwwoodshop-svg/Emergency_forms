@@ -698,6 +698,15 @@ const map = new maplibregl.Map({
   maxBounds: [[minLng - 0.05, minLat - 0.03], [maxLng + 0.05, maxLat + 0.03]],
 });
 
+// Collapse the attribution control to compact (i) button after map loads
+map.on('load', () => {
+  const attrib = document.querySelector('.maplibregl-ctrl-attrib');
+  if (attrib) {
+    attrib.classList.add('maplibregl-compact');
+    attrib.removeAttribute('open');
+  }
+});
+
 // ─── HOUSE MARKERS ────────────────────────────────────────────────────────────
 const houseMarkers = {}; // key → { marker, el }
 
