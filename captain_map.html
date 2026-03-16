@@ -276,8 +276,8 @@ html, body { height: 100%; overflow: hidden; font-family: system-ui, -apple-syst
 <!-- HEADER -->
 <div id="header">
   <div class="hdr-top">
-    <span class="hdr-name">Casey Thornton</span>
-    <span class="hdr-assignment">Willow S / Pleasant View S / Seemore N</span>
+    <span class="hdr-name" id="hdr-name"></span>
+    <span class="hdr-assignment" id="hdr-assignment"></span>
     <span class="sync-indicator" id="sync-indicator">●</span>
   </div>
   <div class="status-bar">
@@ -392,158 +392,23 @@ html, body { height: 100%; overflow: hidden; font-family: system-ui, -apple-syst
 </div>
 
 <script>
-// ─── CAPTAIN DATA (injected by generator) ─────────────────────────────────────
-// Phone numbers are base64-encoded by generate_map_forms.py (enc() function).
-// atob() decodes them at runtime so plain numbers never appear in HTML source.
-// Names and addresses are not encoded — they are less sensitive and needed for
-// visible UI labels (header, report overlay, SMS message body).
-const CAPTAIN_NAME  = "Casey Thornton";
-const CAPTAIN_PHONE = atob("KDgwMSkgNTU1LTAxMDg=");
-const ASSIGNMENT    = "Willow S / Pleasant View S / Seemore N";
-const DIRECTOR_NAME    = "Blake";
-const DIRECTOR_PHONE   = atob("KDgwMSkgNTkzLTk0NDA=");
-const DIRECTOR_ADDRESS = "1400 Flint Meadows Dr Kaysville";
-const BACKUP_NAME    = "TBD";
-const BACKUP_PHONE   = atob("KDgwMSkgNTU1LTAwOTk=");
-const BACKUP_ADDRESS = "TBD";
-const COORDINATOR_NAME  = "Blake";
-const COORDINATOR_PHONE = atob("KDgwMSkgNTkzLTk0NDA=");
+// ─── CAPTAIN DATA (fetched at runtime via token) ──────────────────────────────
+// No personal data is baked into this HTML file. Captain identity, phone numbers,
+// house assignments, and director info are fetched from Supabase using a UUID token
+// in the URL (?t=<uuid>). Data is cached in localStorage for offline use.
 
 const SUPABASE_URL = "https://fvbjmgpmjejkappwxgmk.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ2YmptZ3BtamVqa2FwcHd4Z21rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNjQxNTIsImV4cCI6MjA4ODg0MDE1Mn0.TJeR1xAQFrKmpR8wnxmBnPn-ulxlRXyGfY25resm-v0";
 
-// Houses assigned to this captain — each has: street, name, houseNumber, key, lat, lng
-const HOUSES = [
-  {
-    "street": "Willow Dr.",
-    "houseNumber": "1480",
-    "key": "Willow Dr.|1480",
-    "lat": 41.039837,
-    "lng": -111.9692177
-  },
-  {
-    "street": "Willow Dr.",
-    "houseNumber": "1485",
-    "key": "Willow Dr.|1485",
-    "lat": 41.0397683,
-    "lng": -111.9694376
-  },
-  {
-    "street": "Willow Dr.",
-    "houseNumber": "1493",
-    "key": "Willow Dr.|1493",
-    "lat": 41.0398937,
-    "lng": -111.9695985
-  },
-  {
-    "street": "Willow Dr.",
-    "houseNumber": "1496",
-    "key": "Willow Dr.|1496",
-    "lat": 41.0402333,
-    "lng": -111.969443
-  },
-  {
-    "street": "Willow Dr.",
-    "houseNumber": "1504",
-    "key": "Willow Dr.|1504",
-    "lat": 41.0404314,
-    "lng": -111.9696414
-  },
-  {
-    "street": "Willow Dr.",
-    "houseNumber": "1512",
-    "key": "Willow Dr.|1512",
-    "lat": 41.0406214,
-    "lng": -111.9698131
-  },
-  {
-    "street": "Willow Dr.",
-    "houseNumber": "1520",
-    "key": "Willow Dr.|1520",
-    "lat": 41.0408562,
-    "lng": -111.970017
-  },
-  {
-    "street": "Willow Dr.",
-    "houseNumber": "1528",
-    "key": "Willow Dr.|1528",
-    "lat": 41.0410301,
-    "lng": -111.9701886
-  },
-  {
-    "street": "Willow Dr.",
-    "houseNumber": "1536",
-    "key": "Willow Dr.|1536",
-    "lat": 41.0412365,
-    "lng": -111.9703764
-  },
-  {
-    "street": "Willow Dr.",
-    "houseNumber": "1544",
-    "key": "Willow Dr.|1544",
-    "lat": 41.0414387,
-    "lng": -111.9705749
-  },
-  {
-    "street": "Pleasant View Dr.",
-    "houseNumber": "378",
-    "key": "Pleasant View Dr.|378",
-    "lat": 41.0415159,
-    "lng": -111.968125
-  },
-  {
-    "street": "Pleasant View Dr.",
-    "houseNumber": "379",
-    "key": "Pleasant View Dr.|379",
-    "lat": 41.0412446,
-    "lng": -111.9682199
-  },
-  {
-    "street": "Pleasant View Dr.",
-    "houseNumber": "456",
-    "key": "Pleasant View Dr.|456",
-    "lat": 41.0423003,
-    "lng": -111.9687027
-  },
-  {
-    "street": "Seemore Dr.",
-    "houseNumber": "343",
-    "key": "Seemore Dr.|343",
-    "lat": 41.0403582,
-    "lng": -111.9708484
-  },
-  {
-    "street": "Seemore Dr.",
-    "houseNumber": "350",
-    "key": "Seemore Dr.|350",
-    "lat": 41.0405562,
-    "lng": -111.970253
-  },
-  {
-    "street": "Seemore Dr.",
-    "houseNumber": "357",
-    "key": "Seemore Dr.|357",
-    "lat": 41.0405564,
-    "lng": -111.9706178
-  },
-  {
-    "street": "Seemore Dr.",
-    "houseNumber": "371",
-    "key": "Seemore Dr.|371",
-    "lat": 41.0407142,
-    "lng": -111.9703442
-  },
-  {
-    "street": "Flint Street",
-    "houseNumber": "577",
-    "key": "Flint Street|577",
-    "lat": 41.0439985,
-    "lng": -111.9668097
-  }
-];
+// Read token from URL: ?t=<uuid>
+const TOKEN = new URLSearchParams(window.location.search).get('t');
+const CAPTAIN_CACHE_KEY = TOKEN ? `captainData_${TOKEN}` : null;
 
-// ─── STATE ────────────────────────────────────────────────────────────────────
-const STORAGE_KEY = `blockCaptainMapStatus_${CAPTAIN_NAME.replace(/\s+/g,'_')}`;
+// These are populated by loadCaptainData() before the map initializes
+let CAPTAIN_NAME, CAPTAIN_PHONE, ASSIGNMENT;
+let DIRECTOR_NAME, DIRECTOR_PHONE, DIRECTOR_ADDRESS;
+let HOUSES = [];
+let STORAGE_KEY, BLDG_CACHE_KEY;
 
 function loadState() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch { return {}; }
@@ -552,14 +417,108 @@ function saveState(s) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
 }
 
-let statuses = loadState(); // { houseKey: { status, subtype, notes, updatedAt } }
-let activeKey = null;       // currently open bottom sheet
+let statuses = {};
+let activeKey = null;
 let activeStatus = null;
 let activeSubtype = null;
 
+// ─── TOKEN FETCH + OFFLINE CACHE ─────────────────────────────────────────────
+
+async function fetchCaptainData() {
+  const resp = await fetch(`${SUPABASE_URL}/rest/v1/rpc/get_captain_by_token`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+    },
+    body: JSON.stringify({ p_token: TOKEN }),
+  });
+  if (!resp.ok) return null;
+  return await resp.json();
+}
+
+async function loadCaptainData() {
+  // Try localStorage cache first (works offline)
+  if (CAPTAIN_CACHE_KEY) {
+    const cached = localStorage.getItem(CAPTAIN_CACHE_KEY);
+    if (cached) {
+      try {
+        const data = JSON.parse(cached);
+        if (data && data.name) {
+          applyCaptainData(data);
+          // Background refresh when online — update cache silently
+          if (navigator.onLine) {
+            fetchCaptainData().then(fresh => {
+              if (fresh && fresh.name) localStorage.setItem(CAPTAIN_CACHE_KEY, JSON.stringify(fresh));
+            }).catch(() => {});
+          }
+          return true;
+        }
+      } catch { /* fall through to fetch */ }
+    }
+  }
+
+  // No cache — must fetch
+  try {
+    const data = await fetchCaptainData();
+    if (!data || !data.name) return false;
+    applyCaptainData(data);
+    if (CAPTAIN_CACHE_KEY) localStorage.setItem(CAPTAIN_CACHE_KEY, JSON.stringify(data));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function applyCaptainData(data) {
+  CAPTAIN_NAME     = data.name;
+  CAPTAIN_PHONE    = data.phone || '';
+  ASSIGNMENT       = data.street_assignment || '';
+  DIRECTOR_NAME    = data.director_name || '';
+  DIRECTOR_PHONE   = data.director_phone || '';
+  DIRECTOR_ADDRESS = data.director_address || '';
+  HOUSES           = data.houses || [];
+
+  // Update header
+  document.getElementById('hdr-name').textContent = CAPTAIN_NAME;
+  document.getElementById('hdr-assignment').textContent = ASSIGNMENT;
+}
+
+function showFatalError(msg) {
+  const el = document.getElementById('loading-msg');
+  if (el) {
+    el.querySelector('div:last-child').textContent = msg;
+    el.querySelector('div:last-child').style.color = '#e57373';
+  }
+}
+
+// ─── BOOT: async startup that waits for captain data ─────────────────────────
+(async function boot() {
+  if (!TOKEN) {
+    showFatalError('No access token. Scan your QR code or use the link you were given.');
+    return;
+  }
+
+  const ok = await loadCaptainData();
+  if (!ok) {
+    showFatalError('Invalid or expired link. Contact your coordinator for a new link.');
+    return;
+  }
+
+  // Now captain data is loaded — set up storage keys
+  STORAGE_KEY    = `blockCaptainMapStatus_${TOKEN}`;
+  BLDG_CACHE_KEY = `flint_buildings_v2_${TOKEN}`;
+  statuses = loadState();
+
+  // Check for new emergency
+  checkNewEmergency();
+
+  // Initialize map
+  initMap();
+})();
+
 // ─── NEW EMERGENCY PROMPT ─────────────────────────────────────────────────────
-// Uses a custom modal instead of window.confirm() to avoid showing the page URL,
-// which confused captains who mistook it for a phone message.
 let _newEmergencyResolve = null;
 
 function confirmNewEmergency(isNew) {
@@ -567,14 +526,13 @@ function confirmNewEmergency(isNew) {
   if (isNew) {
     statuses = {};
     saveState(statuses);
-    // Redraw buildings and counts so map visually resets to all-unchecked
     if (typeof redrawBuildingSVG === 'function') redrawBuildingSVG();
     if (typeof updateCounts === 'function') updateCounts();
   }
   if (_newEmergencyResolve) _newEmergencyResolve();
 }
 
-(function checkNewEmergency() {
+function checkNewEmergency() {
   if (Object.keys(statuses).length === 0) return;
   try {
     const last = Object.values(statuses).map(s => s?.updatedAt).filter(Boolean).sort().pop();
@@ -588,18 +546,21 @@ function confirmNewEmergency(isNew) {
     statuses = {};
     saveState(statuses);
   }
-})();
+}
 
-// ─── MAP ─────────────────────────────────────────────────────────────────────
+// ─── MAP INIT (called after captain data is loaded) ──────────────────────────
+let map, minLat, maxLat, minLng, maxLng;
+
+function initMap() {
 const lats = HOUSES.map(h => h.lat);
 const lngs = HOUSES.map(h => h.lng);
-const minLat = Math.min(...lats), maxLat = Math.max(...lats);
-const minLng = Math.min(...lngs), maxLng = Math.max(...lngs);
+minLat = Math.min(...lats); maxLat = Math.max(...lats);
+minLng = Math.min(...lngs); maxLng = Math.max(...lngs);
 
 const SUBTYPE_SYMBOL = { MED: '🏥', FIRE: '🔥', GAS: '💨' };
 const CACHE_NAME = 'flint-meadows-tiles-v3';
 
-const map = new maplibregl.Map({
+map = new maplibregl.Map({
   container: 'map',
   style: 'https://tiles.openfreemap.org/styles/liberty',
   center: [(minLng + maxLng) / 2, (minLat + maxLat) / 2],
@@ -695,7 +656,7 @@ const houseBuildingGeom = {}; // key → { coords: [[lng,lat],...], centLng, cen
 // Cache key is versioned (v2). If the stored object format ever changes (e.g., adding
 // new required fields), bump to v3, v4, etc. to force a fresh Overpass fetch on all
 // captain phones. Old cache had objects without a 'coords' property, causing a crash.
-const BLDG_CACHE_KEY = `flint_buildings_v2_${CAPTAIN_NAME.replace(/\s+/g,'_')}`;
+// BLDG_CACHE_KEY is set in boot() after captain data loads
 
 // Create SVG canvas that covers the map exactly
 const bldgSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -959,7 +920,7 @@ function updateCounts() {
 let syncQueue = {}; // keys pending sync
 
 async function syncToSupabase(key) {
-  if (!SUPABASE_URL || SUPABASE_URL.startsWith('{{')) {
+  if (!SUPABASE_URL || false) {
     showToast('Sync skipped: no Supabase URL', 'error');
     return;
   }
@@ -1024,7 +985,7 @@ function showToast(msg, type) {
 }
 
 async function syncAllPending() {
-  if (!SUPABASE_URL || SUPABASE_URL.startsWith('{{')) return;
+  if (!SUPABASE_URL || false) return;
   // Re-sync everything from localStorage
   for (const key of Object.keys(statuses)) {
     syncQueue[key] = true;
@@ -1223,6 +1184,8 @@ function checkConnectivity() {
 window.addEventListener('online',  checkConnectivity);
 window.addEventListener('offline', checkConnectivity);
 checkConnectivity();
+
+} // end initMap()
 </script>
 </body>
 </html>

@@ -219,7 +219,7 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 
 <script>
 // Baked in by deploy_forms.py when deployed to GitHub Pages.
-// If these contain '{{' they are unset (local dev mode) — manual config screen appears instead.
+// Hardcoded Supabase config — no more placeholder baking at deploy time.
 // Uses anon key (same as captain forms) — safe to deploy publicly since RLS restricts writes.
 const BAKED_SUPABASE_URL = "https://fvbjmgpmjejkappwxgmk.supabase.co";
 const BAKED_SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ2YmptZ3BtamVqa2FwcHd4Z21rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNjQxNTIsImV4cCI6MjA4ODg0MDE1Mn0.TJeR1xAQFrKmpR8wnxmBnPn-ulxlRXyGfY25resm-v0";
