@@ -920,8 +920,10 @@ function updateCounts() {
 let syncQueue = {}; // keys pending sync
 
 async function syncToSupabase(key) {
-  if (!SUPABASE_URL || false) {
-    showToast('Sync skipped: no Supabase URL', 'error');
+  if (!SUPABASE_URL) return;
+  if (!navigator.onLine) {
+    // Queue for later — don't show error toast over the offline banner
+    syncQueue[key] = true;
     return;
   }
   syncQueue[key] = true;
@@ -985,7 +987,7 @@ function showToast(msg, type) {
 }
 
 async function syncAllPending() {
-  if (!SUPABASE_URL || false) return;
+  if (!SUPABASE_URL || !navigator.onLine) return;
   // Re-sync everything from localStorage
   for (const key of Object.keys(statuses)) {
     syncQueue[key] = true;
