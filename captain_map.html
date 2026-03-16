@@ -1185,6 +1185,20 @@ window.addEventListener('online',  checkConnectivity);
 window.addEventListener('offline', checkConnectivity);
 checkConnectivity();
 
+// Expose functions to global scope for HTML onclick handlers
+window.selectStatus = selectStatus;
+window.selectSubtype = selectSubtype;
+window.saveStatus = saveStatus;
+window.openSheet = openSheet;
+window.closeSheet = closeSheet;
+window.showReport = showReport;
+window.hideReport = hideReport;
+window.sendText = sendText;
+window.copyReport = copyReport;
+window.showOfflineModal = showOfflineModal;
+window.hideOfflineModal = hideOfflineModal;
+window.downloadTiles = downloadTiles;
+
 } // end initMap()
 </script>
 </body>
