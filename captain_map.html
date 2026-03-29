@@ -447,10 +447,16 @@ async function loadCaptainData() {
         const data = JSON.parse(cached);
         if (data && data.name) {
           applyCaptainData(data);
-          // Background refresh when online — update cache silently
+          // Background refresh when online — update cache and re-apply if houses changed
           if (navigator.onLine) {
             fetchCaptainData().then(fresh => {
-              if (fresh && fresh.name) localStorage.setItem(CAPTAIN_CACHE_KEY, JSON.stringify(fresh));
+              if (fresh && fresh.name) {
+                localStorage.setItem(CAPTAIN_CACHE_KEY, JSON.stringify(fresh));
+                // If house assignments changed, re-apply so map updates immediately
+                const oldKeys = (data.houses || []).map(h => h.key).sort().join(',');
+                const newKeys = (fresh.houses || []).map(h => h.key).sort().join(',');
+                if (oldKeys !== newKeys) applyCaptainData(fresh);
+              }
             }).catch(() => {});
           }
           return true;
