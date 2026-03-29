@@ -228,8 +228,8 @@
     "street": "Carriage Ln.",
     "houseNumber": "1882",
     "key": "Carriage Ln.|1882",
-    "lat": 41.0413006,
-    "lng": -111.9734663,
+    "lat": 41.041418,
+    "lng": -111.973274,
     "geocodeStatus": "ok",
     "manuallyAdjusted": true
   },
@@ -1533,10 +1533,10 @@
     "street": "Carriage Ln.",
     "houseNumber": "434",
     "key": "Carriage Ln.|434",
-    "lat": 41.0417,
-    "lng": -111.97314,
-    "geocodeStatus": "interpolated",
-    "manuallyAdjusted": false
+    "lat": 41.041742,
+    "lng": -111.972727,
+    "geocodeStatus": "ok",
+    "manuallyAdjusted": true
   },
   {
     "street": "Carriage Ln.",
