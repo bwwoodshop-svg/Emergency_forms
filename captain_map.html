@@ -749,14 +749,18 @@ function updateHouseLayer() {
 
 function applyBuildingFootprints(polygons) {
   let matched = 0;
+  // Track which buildings have already been claimed so two houses don't share one polygon
+  const claimed = new Set();
   HOUSES.forEach(h => {
     let best = null, bestDist = Infinity;
-    polygons.forEach(b => {
+    polygons.forEach((b, i) => {
+      if (claimed.has(i)) return; // already matched to another house
       const d = Math.hypot(b.lng - h.lng, b.lat - h.lat);
-      if (d < bestDist) { bestDist = d; best = b; }
+      if (d < bestDist) { bestDist = d; best = { b, i }; }
     });
     if (best && bestDist < 0.0006) {
-      houseBuildingGeom[h.key] = best;
+      houseBuildingGeom[h.key] = best.b;
+      claimed.add(best.i);
       if (houseMarkers[h.key]) houseMarkers[h.key].el.style.display = 'none';
       matched++;
     }
