@@ -1182,8 +1182,8 @@
     "street": "W. Phillips Street",
     "houseNumber": "1587",
     "key": "W. Phillips Street|1587",
-    "lat": 41.0449789,
-    "lng": -111.9712347,
+    "lat": 41.044839,
+    "lng": -111.971093,
     "geocodeStatus": "ok",
     "manuallyAdjusted": true
   },
@@ -1191,8 +1191,8 @@
     "street": "W. Phillips Street",
     "houseNumber": "1603",
     "key": "W. Phillips Street|1603",
-    "lat": 41.044643,
-    "lng": -111.971342,
+    "lat": 41.044594,
+    "lng": -111.971391,
     "geocodeStatus": "ok",
     "manuallyAdjusted": true
   },
@@ -1200,8 +1200,8 @@
     "street": "W. Phillips Street",
     "houseNumber": "1613",
     "key": "W. Phillips Street|1613",
-    "lat": 41.04474,
-    "lng": -111.9716048,
+    "lat": 41.044499,
+    "lng": -111.971761,
     "geocodeStatus": "ok",
     "manuallyAdjusted": true
   },
