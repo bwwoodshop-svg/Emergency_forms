@@ -280,15 +280,6 @@
   },
   {
     "street": "E. Phillips Street",
-    "houseNumber": "30",
-    "key": "E. Phillips Street|30",
-    "lat": 41.0468642,
-    "lng": -111.9652104,
-    "geocodeStatus": "warn",
-    "manuallyAdjusted": true
-  },
-  {
-    "street": "E. Phillips Street",
     "houseNumber": "38B",
     "key": "E. Phillips Street|38B",
     "lat": 41.0466423,
@@ -309,8 +300,8 @@
     "street": "E. Phillips Street",
     "houseNumber": "70",
     "key": "E. Phillips Street|70",
-    "lat": 41.0471113,
-    "lng": -111.9647652,
+    "lat": 41.046915,
+    "lng": -111.964905,
     "geocodeStatus": "warn",
     "manuallyAdjusted": true
   },
@@ -318,8 +309,8 @@
     "street": "E. Phillips Street",
     "houseNumber": "92",
     "key": "E. Phillips Street|92",
-    "lat": 41.0472813,
-    "lng": -111.964336,
+    "lat": 41.0471113,
+    "lng": -111.9647652,
     "geocodeStatus": "warn",
     "manuallyAdjusted": true
   },
@@ -327,8 +318,8 @@
     "street": "E. Phillips Street",
     "houseNumber": "102",
     "key": "E. Phillips Street|102",
-    "lat": 41.0473699,
-    "lng": -111.9641429,
+    "lat": 41.0472813,
+    "lng": -111.964336,
     "geocodeStatus": "warn",
     "manuallyAdjusted": true
   },
