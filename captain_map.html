@@ -750,7 +750,7 @@ function updateHouseLayer() {
 function applyBuildingFootprints(polygons) {
   let matched = 0;
   // Houses that share a building in OSM data — skip polygon matching, use circle marker instead
-  const SKIP_POLYGON = new Set(['W. Phillips Street|1576']);
+  const SKIP_POLYGON = new Set(['W. Phillips Street|1576', 'W. Phillips Street|1592']);
   // Build all possible house→building pairs with distances, then assign closest first.
   // This prevents a distant house from stealing a closer house's building.
   const pairs = [];
