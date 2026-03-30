@@ -749,21 +749,26 @@ function updateHouseLayer() {
 
 function applyBuildingFootprints(polygons) {
   let matched = 0;
-  // Track which buildings have already been claimed so two houses don't share one polygon
-  const claimed = new Set();
+  // Build all possible house→building pairs with distances, then assign closest first.
+  // This prevents a distant house from stealing a closer house's building.
+  const pairs = [];
   HOUSES.forEach(h => {
-    let best = null, bestDist = Infinity;
     polygons.forEach((b, i) => {
-      if (claimed.has(i)) return; // already matched to another house
       const d = Math.hypot(b.lng - h.lng, b.lat - h.lat);
-      if (d < bestDist) { bestDist = d; best = { b, i }; }
+      if (d < 0.0006) pairs.push({ h, b, i, d });
     });
-    if (best && bestDist < 0.0006) {
-      houseBuildingGeom[h.key] = best.b;
-      claimed.add(best.i);
-      if (houseMarkers[h.key]) houseMarkers[h.key].el.style.display = 'none';
-      matched++;
-    }
+  });
+  // Sort by distance — closest matches assigned first
+  pairs.sort((a, b) => a.d - b.d);
+  const claimedBuildings = new Set();
+  const claimedHouses = new Set();
+  pairs.forEach(p => {
+    if (claimedBuildings.has(p.i) || claimedHouses.has(p.h.key)) return;
+    houseBuildingGeom[p.h.key] = p.b;
+    claimedBuildings.add(p.i);
+    claimedHouses.add(p.h.key);
+    if (houseMarkers[p.h.key]) houseMarkers[p.h.key].el.style.display = 'none';
+    matched++;
   });
   if (matched) redrawBuildingSVG();
   _buildingsReady = true;
