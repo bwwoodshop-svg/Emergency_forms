@@ -246,9 +246,9 @@
     "street": "Carriage Ln.",
     "houseNumber": "1889",
     "key": "Carriage Ln.|1889",
-    "lat": 41.0413739,
-    "lng": -111.9738525,
-    "geocodeStatus": "warn",
+    "lat": 41.041323,
+    "lng": -111.974067,
+    "geocodeStatus": "ok",
     "manuallyAdjusted": true
   },
   {
